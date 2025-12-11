@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butwal Construction | Detailed BOQ System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .paper-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Print Optimization */
+        @media print {
+            body { 
+                background-color: white; 
+                height: auto; 
+                overflow: visible !important;
+                font-size: 12px !important;
+            }
+            
+            .sidebar-panel, .action-buttons, .no-print, .calculation-details, 
+            .material-bar-chart, .material-requirements, 
+            .chart-container .material-bar-chart, #areaBreakdownContainer { 
+                display: none !important; 
+            }
+            
+            .main-content { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                overflow: visible !important; 
+            }
+            
+            #boqDocument { 
+                box-shadow: none !important; 
+                margin: 0 !important; 
+                padding: 15px !important;
+                width: 100% !important; 
+                max-width: 100% !important;
+                position: relative;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* Fix for pie chart container */
+            .cost-pie-chart {
+                display: block !important;
+                height: 280px !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-bottom: 20px !important;
+                border: 1px solid #ddd !important;
+                padding: 10px !important;
+            }
+            
+            /* Ensure chart doesn't break */
+            .chart-container {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                display: block !important;
+                margin-bottom: 20px !important;
+            }
+            
+            /* Hide bar chart in print */
+            .material-bar-chart {
+                display: none !important;
+            }
+            
+            /* Fix table header repeating */
+            table { 
+                page-break-inside: auto !important;
+            }
+            
+            tr { 
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
+            }
+            
+            thead { 
+                display: table-header-group !important; 
+            }
+            
+            tfoot { 
+                display: table-footer-group !important; 
+            }
+            
+            /* Remove watermark for print */
+            .absolute.inset-0 {
+                display: none !important;
+            }
+            
+            /* Fix page breaks */
+            .page-break-before {
+                page-break-before: always !important;
+            }
+            
+            .page-break-after {
+                page-break-after: always !important;
+            }
+            
+            .avoid-break {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            /* Adjust signature section */
+            .signature-section {
+                margin-top: 40px !important;
+                padding-top: 15px !important;
+            }
+            
+            /* Adjust spacing */
+            header {
+                padding-bottom: 15px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            /* Project summary */
+            .bg-slate-50 {
+                padding: 15px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            /* Grand total section */
+            .bg-slate-900 {
+                margin-bottom: 20px !important;
+                padding: 15px !important;
+            }
+        }
+
+        /* Signature section styling */
+        .signature-section {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 2px solid #cbd5e1;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #374151;
+            width: 80%;
+            margin: 5px auto 0 auto;
+            height: 20px;
+        }
+
+        .stamp-area {
+            position: relative;
+            min-height: 80px;
+        }
+
+        .official-stamp {
+            position: absolute;
+            right: 0;
+            top: -20px;
+            opacity: 0.8;
+        }
+
+        /* Checkbox styling */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #f97316;
+        }
+
+        .checkbox-label {
+            font-size: 12px;
+            color: #cbd5e1;
+            flex: 1;
+        }
+
+        .checkbox-category {
+            font-size: 11px;
+            font-weight: 600;
+            color: #f97316;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #4b5563;
+        }
+
+        .optional-items-container {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 6px;
+            border: 1px solid #4b5563;
+        }
+
+        /* Custom items styling */
+        .custom-item-entry {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .custom-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .custom-item-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f97316;
+        }
+
+        .remove-custom-item {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .custom-items-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        /* Print-specific styling for charts */
+        @media print {
+            #costPieChart {
+                max-height: 250px !important;
+                width: 100% !important;
+            }
+            
+            /* Ensure chart canvas doesn't break */
+            canvas {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            /* Adjust chart legend for print */
+            .chartjs-legend {
+                font-size: 10px !important;
+                max-width: 100% !important;
+            }
+        }
+
+        /* Watermark for screen only */
+        .watermark-screen {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.05;
+            background-image: url('watermark.png');
+            background-repeat: repeat;
+            background-size: 400px 400px;
+            z-index: 1;
+        }
+
+        /* Chart container for print */
+        .print-chart-container {
+            display: none;
+        }
+
+        @media print {
+            .print-chart-container {
+                display: block;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                margin: 20px 0;
+            }
+            
+            .screen-chart-container {
+                display: none;
+            }
+        }
+
+        /* Area entries styling */
+        .area-entry {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .area-entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .area-entry-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f97316;
+        }
+
+        .remove-area-entry {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .area-entries-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+
+        .area-summary {
+            background-color: rgba(30, 41, 59, 0.9);
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .area-summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .area-summary-total {
+            border-top: 1px solid #4b5563;
+            padding-top: 6px;
+            margin-top: 6px;
+            font-weight: bold;
+            color: #f97316;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: #10b981;
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="flex text-slate-800">
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-900/80 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-96">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-orange-600 rounded flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    <i class="fas fa-hard-hat"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl leading-tight">Butwal<br>Construction</h1>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Secure Login</h2>
+            <p class="text-slate-600 mb-6">Enter your credentials to access the system</p>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+                    <input type="text" id="username" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none" placeholder="Enter username">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="password" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none" placeholder="Enter password">
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold py-3 rounded-lg shadow-lg transform transition hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    <i class="fas fa-lock"></i> Login
+                </button>
+            </form>
+            <p class="text-xs text-slate-500 mt-4 text-center">© 2023 Butwal Construction & Builders. All rights reserved.</p>
+        </div>
+    </div>
+
+    <!-- Sidebar Input Panel -->
+    <aside class="sidebar-panel w-96 bg-slate-900 text-white flex-shrink-0 h-full overflow-y-auto z-20 fixed md:relative flex flex-col shadow-2xl">
+        <div class="p-5 border-b border-slate-700 bg-slate-800 sticky top-0 z-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-600 rounded flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    <i class="fas fa-hard-hat"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Butwal<br>Construction</h1>
+                </div>
+            </div>
+            <p class="text-slate-400 text-xs mt-2">Advanced Estimate System v4.2</p>
+            <button id="logoutBtn" class="mt-2 text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="p-5 flex-1">
+            <form id="boqForm" class="space-y-6">
+                
+                <!-- Project Type -->
+                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2">Project Type</label>
+                    <div class="flex gap-2">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="projectType" value="new" checked class="peer sr-only">
+                            <div class="text-center py-2 rounded text-sm bg-slate-700 text-slate-400 peer-checked:bg-orange-600 peer-checked:text-white transition-all font-medium">
+                                New Building
+                            </div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="projectType" value="renovation" class="peer sr-only">
+                            <div class="text-center py-2 rounded text-sm bg-slate-700 text-slate-400 peer-checked:bg-orange-600 peer-checked:text-white transition-all font-medium">
+                                Renovation
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Basic Info -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Client Details</label>
+                    <input type="text" id="clientName" placeholder="Client Name" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white transition-colors">
+                    <input type="text" id="projectLocation" placeholder="Site Location" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white transition-colors">
+                </div>
+
+                <!-- Multiple Rooms/Areas Section -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Multiple Rooms/Areas</label>
+                    
+                    <div class="mb-4">
+                        <p class="text-xs text-slate-400 mb-2">Add multiple areas with different rates:</p>
+                        <div class="grid grid-cols-3 gap-2 mb-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Description</label>
+                                <input type="text" id="areaDesc" placeholder="e.g., Ground Floor" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Area (Sq.Ft)</label>
+                                <input type="number" id="areaValue" placeholder="Area" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Rate (NPR/Sq.Ft)</label>
+                                <input type="number" id="areaRate" placeholder="Rate" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                        </div>
+                        <button type="button" id="addAreaEntry" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-medium py-2 rounded-lg transition-colors text-xs border border-slate-700">
+                            <i class="fas fa-plus mr-1"></i> Add Area Entry
+                        </button>
+                    </div>
+
+                    <!-- Area Entries List -->
+                    <div id="areaEntriesList" class="area-entries-list">
+                        <!-- Default entry -->
+                        <div class="area-entry" data-id="1">
+                            <div class="area-entry-header">
+                                <span class="area-entry-title">Main Building Area</span>
+                                <button type="button" onclick="removeAreaEntry(1)" class="remove-area-entry" title="Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="text-[10px] text-slate-400 mb-1 block">Description</label>
+                                    <input type="text" value="Main Building" class="area-desc w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400 mb-1 block">Area (Sq.Ft)</label>
+                                    <input type="number" value="1000" class="area-value w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-400 mb-1 block">Rate (NPR/Sq.Ft)</label>
+                                    <input type="number" value="3500" class="area-rate w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Area Summary -->
+                    <div id="areaSummary" class="area-summary">
+                        <div class="area-summary-item">
+                            <span>Total Areas:</span>
+                            <span id="totalAreasCount">1</span>
+                        </div>
+                        <div class="area-summary-item">
+                            <span>Total Area (Sq.Ft):</span>
+                            <span id="totalAreaSum">1000</span>
+                        </div>
+                        <div class="area-summary-item">
+                            <span>Average Rate:</span>
+                            <span id="averageRate">3500</span> NPR/Sq.Ft
+                        </div>
+                        <div class="area-summary-item area-summary-total">
+                            <span>Total Investment:</span>
+                            <span id="totalInvestment">3,500,000</span> NPR
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dimensions -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Dimensions & Floors</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">No. of Floors</label>
+                            <select id="floors" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white">
+                                <option value="1">1 Floor</option>
+                                <option value="1.5">1.5 Floors</option>
+                                <option value="2">2 Floors</option>
+                                <option value="2.5">2.5 Floors</option>
+                                <option value="3">3 Floors</option>
+                                <option value="4">4 Floors</option>
+                                <option value="5">5 Floors</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Total Area</label>
+                            <div class="flex items-center">
+                                <input type="text" id="totalAreaDisplay" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-white font-bold" readonly value="1000">
+                                <span class="ml-2 text-sm text-slate-400">Sq.Ft</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Configuration -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Room Configuration</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Bedrooms</label>
+                            <div class="flex items-center bg-slate-900 rounded border border-slate-700">
+                                <button type="button" onclick="adjInput('nBed', -1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-l">-</button>
+                                <input type="number" id="nBed" value="2" class="w-full bg-transparent text-center text-white text-sm focus:outline-none py-1" readonly>
+                                <button type="button" onclick="adjInput('nBed', 1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-r">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Living Rooms</label>
+                            <div class="flex items-center bg-slate-900 rounded border border-slate-700">
+                                <button type="button" onclick="adjInput('nLiv', -1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-l">-</button>
+                                <input type="number" id="nLiv" value="1" class="w-full bg-transparent text-center text-white text-sm focus:outline-none py-1" readonly>
+                                <button type="button" onclick="adjInput('nLiv', 1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-r">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Kitchens</label>
+                            <div class="flex items-center bg-slate-900 rounded border border-slate-700">
+                                <button type="button" onclick="adjInput('nKit', -1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-l">-</button>
+                                <input type="number" id="nKit" value="1" class="w-full bg-transparent text-center text-white text-sm focus:outline-none py-1" readonly>
+                                <button type="button" onclick="adjInput('nKit', 1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-r">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Toilets/Bath</label>
+                            <div class="flex items-center bg-slate-900 rounded border border-slate-700">
+                                <button type="button" onclick="adjInput('nBath', -1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-l">  -</button>
+                                <input type="number" id="nBath" value="1" class="w-full bg-transparent text-center text-white text-sm focus:outline-none py-1" readonly>
+                                <button type="button" onclick="adjInput('nBath', 1)" class="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded-r">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional Items Checkboxes -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Optional Items Selection</label>
+                    <div class="flex gap-2 mb-3">
+                        <button type="button" onclick="toggleAllCheckboxes(true)" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs py-1 px-2 rounded text-center">
+                            <i class="fas fa-check mr-1"></i> Select All
+                        </button>
+                        <button type="button" onclick="toggleAllCheckboxes(false)" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-xs py-1 px-2 rounded text-center">
+                            <i class="fas fa-times mr-1"></i> Deselect All
+                        </button>
+                    </div>
+                    <div class="optional-items-container">
+                        <div class="checkbox-category">GENERAL ITEMS</div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_hording" checked>
+                            <label for="opt_hording" class="checkbox-label">Project Hording Board</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_insurance" checked>
+                            <label for="opt_insurance" class="checkbox-label">Insurance</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_labtest" checked>
+                            <label for="opt_labtest" class="checkbox-label">Laboratory Testing</label>
+                        </div>
+                        
+                        <div class="checkbox-category">SANITARY ITEMS</div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_flushvalve" checked>
+                            <label for="opt_flushvalve" class="checkbox-label">Push Button Flush Valve</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_wc" checked>
+                            <label for="opt_wc" class="checkbox-label">Water Closet (WC) Pans</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_washbasin" checked>
+                            <label for="opt_washbasin" class="checkbox-label">Wash Basin</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_shower" checked>
+                            <label for="opt_shower" class="checkbox-label">Shower Set</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_sink" checked>
+                            <label for="opt_sink" class="checkbox-label">Overhead Sinks for Kitchen</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_tank" checked>
+                            <label for="opt_tank" class="checkbox-label">Water Tank (1000 Ltrs)</label>
+                        </div>
+                        
+                        <div class="checkbox-category">ELECTRICAL ITEMS</div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_switches" checked>
+                            <label for="opt_switches" class="checkbox-label">Switches and Sockets</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_fans" checked>
+                            <label for="opt_fans" class="checkbox-label">Ceiling Fans</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_lights" checked>
+                            <label for="opt_lights" class="checkbox-label">Light Fittings</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="opt_mcb" checked>
+                            <label for="opt_mcb" class="checkbox-label">MCB Distribution Board</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Items Section -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Custom Items</label>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Description</label>
+                            <input type="text" id="customDesc" placeholder="Item description" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Unit</label>
+                                <input type="text" id="customUnit" placeholder="Unit (e.g., Pcs, Ltr, Kg)" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Quantity</label>
+                                <input type="number" id="customQty" placeholder="Quantity" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white" value="1">
+                            </div>
+                        </div>
+                        <button type="button" id="addCustomItem" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-medium py-2 rounded-lg transition-colors text-sm border border-slate-700">
+                            <i class="fas fa-plus mr-1"></i> Add Custom Item
+                        </button>
+                        
+                        <!-- Custom Items List -->
+                        <div id="customItemsList" class="custom-items-list">
+                            <!-- Custom items will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signature Details -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Signature Details</label>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Prepared By</label>
+                            <input type="text" id="preparedBy" placeholder="Name of preparer" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Approved By</label>
+                            <input type="text" id="approvedBy" placeholder="Name of approver" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm focus:border-orange-500 focus:outline-none text-white">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material Calculation Parameters -->
+                <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700">
+                    <label class="block text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Material Calculation Parameters</label>
+                    
+                    <!-- Brick Calculation Parameters -->
+                    <div class="mb-4">
+                        <label class="text-xs text-slate-400 mb-2 block">Brick Calculation</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Wall Thickness (ft)</label>
+                                <input type="number" id="wallThickness" value="0.67" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Brick Length (ft)</label>
+                                <input type="number" id="brickLength" value="0.67" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Brick Height (ft)</label>
+                                <input type="number" id="brickHeight" value="0.29" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Brick Thickness (ft)</label>
+                                <input type="number" id="brickThickness" value="0.22" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Wastage (%)</label>
+                                <input type="number" id="brickWastage" value="10" step="1" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Concrete Calculation Parameters -->
+                    <div class="mb-4">
+                        <label class="text-xs text-slate-400 mb-2 block">Concrete Mix Ratio</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Cement</label>
+                                <input type="number" id="cementRatio" value="1" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Sand</label>
+                                <input type="number" id="sandRatio" value="1.5" step="0.1" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Aggregate</label>
+                                <input type="number" id="aggregateRatio" value="3" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Steel Calculation Parameters -->
+                    <div>
+                        <label class="text-xs text-slate-400 mb-2 block">Steel Calculation</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Steel Factor (Kg/Sq.Ft)</label>
+                                <input type="number" id="steelFactor" value="4" step="0.1" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 mb-1 block">Concrete Volume Factor</label>
+                                <input type="number" id="concreteVolumeFactor" value="0.15" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="pt-2 space-y-3">
+                    <button type="submit" class="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold py-3 rounded-lg shadow-lg transform transition hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <i class="fas fa-calculator"></i> Generate Estimate
+                    </button>
+                    
+                    <button type="button" id="resetBtn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-medium py-2 rounded-lg transition-colors text-sm border border-slate-700">
+                        Reset Form
+                    </button>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content flex-1 h-full overflow-y-auto bg-slate-100 relative">
+        
+        <!-- Floating Action Buttons (Desktop) -->
+        <div class="action-buttons fixed top-6 right-8 flex flex-col gap-3 z-10">
+            <button onclick="generatePDF()" class="bg-slate-800 text-white w-12 h-12 rounded-full shadow-xl hover:bg-slate-700 flex items-center justify-center transition-all hover:scale-110 tooltip" title="Save as PDF">
+                <i class="fas fa-file-pdf text-lg"></i>
+            </button>
+            <button onclick="window.print()" class="bg-slate-800 text-white w-12 h-12 rounded-full shadow-xl hover:bg-slate-700 flex items-center justify-center transition-all hover:scale-110 tooltip" title="Print">
+                <i class="fas fa-print text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="min-h-screen flex flex-col items-center justify-center text-slate-400 opacity-70 p-8">
+            <div class="w-24 h-24 bg-slate-200 rounded-full flex items-center justify-center mb-6">
+                <i class="fas fa-clipboard-list text-4xl text-slate-400"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-600 mb-2">Ready to Estimate</h2>
+            <p class="text-slate-500 max-w-md text-center">Enter the project area, unit rate, and room configuration in the sidebar to generate a comprehensive quantity report.</p>
+        </div>
+
+        <!-- Report Content -->
+        <div id="boqDocument" class="hidden w-full max-w-5xl mx-auto bg-white min-h-screen p-12 md:p-16 shadow-xl my-8 print:my-0 print:shadow-none print:p-8 relative avoid-break">
+            
+            <!-- Watermark for screen view only -->
+            <div class="watermark-screen print:hidden"></div>
+
+            <!-- Letterhead with Logo -->
+            <header class="flex justify-between items-start border-b-4 border-slate-800 pb-6 mb-10 relative z-10 avoid-break">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-orange-600 rounded flex items-center justify-center text-white font-bold text-2xl print:w-14 print:h-14">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold text-slate-900 uppercase tracking-tight mb-1">Project Estimate</h1>
+                        <p class="text-orange-600 font-medium text-lg">Quantity Schedule (BOQ)</p>
+                        <div class="mt-2 text-sm text-slate-600">
+                            <div>Satyawati Devi Hardware | Navdurga Furniture</div>
+                            <div>Since 2075 BS</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-slate-800">Butwal Construction & Builders</div>
+                    <div class="text-sm text-slate-500">Main Office: Butwal-11, Kalikanagar</div>
+                    <div class="text-sm text-slate-500">Branch: Tilottama, Shankharpur</div>
+                    <div class="text-sm text-slate-500">Ph: 9763653181, 9869472803</div>
+                    <div class="text-xs text-slate-500 mt-1">Official Distributor: Brij Cement, Laxmi Rod, Kinshn Plumbing</div>
+                </div>
+            </header>
+
+            <!-- Project Summary Grid -->
+            <div class="bg-slate-50 rounded-xl p-6 mb-10 border border-slate-100 relative z-10 avoid-break">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                    <div>
+                        <p class="text-xs uppercase text-slate-500 font-bold tracking-wider mb-1">Client</p>
+                        <p id="dispClient" class="font-semibold text-slate-800 text-lg">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase text-slate-500 font-bold tracking-wider mb-1">Location</p>
+                        <p id="dispLoc" class="font-semibold text-slate-800 text-lg">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase text-slate-500 font-bold tracking-wider mb-1">Total Area</p>
+                        <p class="font-semibold text-slate-800 text-lg"><span id="dispArea">0</span> <span class="text-sm font-normal text-slate-500">sq.ft</span></p>
+                    </div>
+                    <div>
+                        <p class="text-xs uppercase text-slate-500 font-bold tracking-wider mb-1">No. of Floors</p>
+                        <p class="font-semibold text-slate-800 text-lg"><span id="dispFloors">0</span></p>
+                    </div>
+                </div>
+                
+                <div class="border-t border-slate-200 pt-4 grid grid-cols-4 gap-4 text-center">
+                    <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+                        <span class="block text-2xl font-bold text-slate-700" id="dispBed">0</span>
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">Bedrooms</span>
+                    </div>
+                    <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+                        <span class="block text-2xl font-bold text-slate-700" id="dispLiv">0</span>
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">Living</span>
+                    </div>
+                    <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+                        <span class="block text-2xl font-bold text-slate-700" id="dispKit">0</span>
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">Kitchen</span>
+                    </div>
+                    <div class="bg-white p-2 rounded border border-slate-200 shadow-sm">
+                        <span class="block text-2xl font-bold text-slate-700" id="dispBath">0</span>
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">Toilets</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Breakdown Table (Hidden in Print) -->
+            <div id="areaBreakdownContainer" class="mb-8">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-orange-500 pl-3">Area & Cost Breakdown</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left mb-8 border-collapse border border-slate-200">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-xs uppercase tracking-wider border-b border-slate-300">
+                                <th class="py-3 px-4 w-16 border-r border-slate-200">SN</th>
+                                <th class="py-3 px-4 border-r border-slate-200">Description</th>
+                                <th class="py-3 px-4 text-center w-24 border-r border-slate-200">Area (Sq.Ft)</th>
+                                <th class="py-3 px-4 text-center w-32 border-r border-slate-200">Rate (NPR/Sq.Ft)</th>
+                                <th class="py-3 px-4 text-right w-32 bg-orange-50 text-orange-900 font-bold">Amount (NPR)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="areaBreakdownBody" class="text-xs text-slate-700">
+                            <!-- Area breakdown rows will be injected here -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-slate-800 text-white font-bold">
+                                <td colspan="2" class="py-3 px-4 text-right">GRAND TOTAL:</td>
+                                <td id="totalAreaFooter" class="py-3 px-4 text-center"></td>
+                                <td id="averageRateFooter" class="py-3 px-4 text-center"></td>
+                                <td id="totalInvestmentFooter" class="py-3 px-4 text-right"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Executive Summary (Grand Total) -->
+            <div class="flex items-center justify-between bg-slate-900 text-white p-6 rounded-lg shadow-lg mb-12 print:bg-black print:text-black print:border print:border-black relative z-10 avoid-break">
+                <div>
+                    <h3 class="text-xl font-bold text-orange-400 print:text-black">Total Estimated Project Investment</h3>
+                    <p class="text-slate-400 text-sm print:text-black">Based on detailed quantity analysis</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-4xl font-bold font-mono print:text-black" id="dispGrandTotal">Rs. 0.00</div>
+                </div>
+            </div>
+
+            <!-- Material Quantity Overview (Visual) - Hidden in Print -->
+            <div class="material-requirements relative z-10">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-orange-500 pl-3">A. Key Material Requirements</h3>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-4 mb-8">
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-100 text-center">
+                        <p class="text-xs text-blue-600 font-bold uppercase mb-1">Cement</p>
+                        <p class="text-xl font-bold text-slate-800" id="qtyCement">0</p>
+                        <p class="text-[10px] text-slate-500">Bags</p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-100 text-center">
+                        <p class="text-xs text-yellow-600 font-bold uppercase mb-1">Sand</p>
+                        <p class="text-xl font-bold text-slate-800" id="qtySand">0</p>
+                        <p class="text-[10px] text-slate-500">Tons</p>
+                    </div>
+                    <div class="p-4 bg-stone-50 rounded-lg border border-stone-100 text-center">
+                        <p class="text-xs text-stone-600 font-bold uppercase mb-1">Aggregate</p>
+                        <p class="text-xl font-bold text-slate-800" id="qtyAgg">0</p>
+                        <p class="text-[10px] text-slate-500">Tons</p>
+                    </div>
+                    <div class="p-4 bg-red-50 rounded-lg border border-red-100 text-center">
+                        <p class="text-xs text-red-600 font-bold uppercase mb-1">Bricks</p>
+                        <p class="text-xl font-bold text-slate-800" id="qtyBricks">0</p>
+                        <p class="text-[10px] text-slate-500">Pcs</p>
+                    </div>
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-100 text-center">
+                        <p class="text-xs text-gray-600 font-bold uppercase mb-1">Steel</p>
+                        <p class="text-xl font-bold text-slate-800" id="qtySteel">0</p>
+                        <p class="text-[10px] text-slate-500">Kg</p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg border border-green-100 text-center">
+                        <p class="text-xs text-green-600 font-bold uppercase mb-1">Paint</p>
+                        <p class="text-xl font-bold text-slate-800" id="qtyPaint">0</p>
+                        <p class="text-[10px] text-slate-500">Ltr</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculation Details (Hidden in Print/PDF) -->
+            <div class="calculation-details relative z-10">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-orange-500 pl-3">B. Calculation Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-700 mb-2">Brick Calculation</h4>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <div>Wall Volume: <span id="wallVolume">0</span> cu.ft</div>
+                            <div>Brick Volume: <span id="brickVolume">0</span> cu.ft</div>
+                            <div>Bricks (before wastage): <span id="bricksBeforeWastage">0</span></div>
+                            <div>Wastage: <span id="brickWastagePercent">0</span>%</div>
+                            <div class="font-bold">Total Bricks: <span id="totalBricks">0</span></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-700 mb-2">Concrete Calculation</h4>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <div>Mix Ratio: <span id="concreteRatio">1:1.5:3</span></div>
+                            <div>Wet Volume: <span id="wetVolume">0</span> cu.ft</div>
+                            <div>Dry Volume: <span id="dryVolume">0</span> cu.ft</div>
+                            <div>Cement Volume: <span id="cementVolume">0</span> cu.ft</div>
+                            <div class="font-bold">Cement Bags: <span id="cementBags">0</span></div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h4 class="text-sm font-bold text-slate-700 mb-2">Steel Calculation</h4>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <div>Built-up Area: <span id="builtupArea">0</span> sq.ft</div>
+                            <div>Steel Factor: <span id="steelFactorValue">4</span> kg/sq.ft</div>
+                            <div class="font-bold">Total Steel: <span id="totalSteel">0</span> kg</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section - Modified for better print layout -->
+            <div class="chart-container mb-12 relative z-10 avoid-break print:page-break-inside-avoid">
+                <!-- Simple chart for print - easier to control -->
+                <div class="cost-pie-chart bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+                    <h4 class="text-sm font-bold text-slate-700 mb-3 text-center">Cost Distribution by Category</h4>
+                    <div class="h-64 print:h-56">
+                        <canvas id="costPieChart"></canvas>
+                    </div>
+                </div>
+                <div class="material-bar-chart bg-white p-4 rounded-lg border border-slate-200 shadow-sm mt-6">
+                    <h4 class="text-sm font-bold text-slate-700 mb-3 text-center">Material Quantity Comparison</h4>
+                    <div class="h-64">
+                        <canvas id="materialBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page break before detailed schedule -->
+            <div class="page-break-before"></div>
+
+            <!-- Detailed BOQ Table -->
+            <h3 class="text-lg font-bold text-slate-800 mb-4 border-l-4 border-orange-500 pl-3 avoid-break">C. Detailed Quantity Schedule</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left mb-8 border-collapse border border-slate-200 relative z-10">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 text-xs uppercase tracking-wider border-b border-slate-300">
+                            <th class="py-3 px-4 w-16 border-r border-slate-200">SN</th>
+                            <th class="py-3 px-4 border-r border-slate-200">Description of Item</th>
+                            <th class="py-3 px-4 text-center w-24 border-r border-slate-200">Unit</th>
+                            <th class="py-3 px-4 text-right w-32 bg-orange-50 text-orange-900 font-bold">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="boqTableBody" class="text-xs text-slate-700">
+                        <!-- Content Injected JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Disclaimer & Footer -->
+            <div class="mt-12 pt-6 border-t border-slate-200 text-xs text-slate-500 text-justify relative z-10 avoid-break">
+                <p class="mb-2"><span class="font-bold">Note:</span> This estimate is generated by software made by Butwal Construction & Builders. Copyright © 2023. All rights reserved. The cost may vary by ±10% depending on the brand and market conditions.</p>
+                <p>Quantities for civil works are derived from total carpet area. Quantities for sanitary and electrical works are derived from the specific room configuration provided.</p>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-section grid grid-cols-3 gap-8 mt-16 relative z-10 avoid-break">
+                <div class="text-center">
+                    <div class="signature-line"></div>
+                    <p class="font-bold text-slate-800 mt-2" id="dispPreparedBy">Prepared By</p>
+                    <p class="text-sm text-slate-600">Date: <span id="currentDate"></span></p>
+                </div>
+                <div class="text-center">
+                    <div class="signature-line"></div>
+                    <p class="font-bold text-slate-800 mt-2">Checked By</p>
+                    <p class="text-sm text-slate-600">Project Manager</p>
+                </div>
+                <div class="text-center stamp-area">
+                    <div class="signature-line"></div>
+                    <p class="font-bold text-slate-800 mt-2" id="dispApprovedBy">Approved By</p>
+                    <p class="text-sm text-slate-600">Director</p>
+                    <div class="official-stamp w-24 h-24 print:w-20 print:h-20 border-2 border-red-600 rounded-full flex items-center justify-center text-red-600 font-bold text-xs text-center">
+                        OFFICIAL<br>STAMP
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- Login System ---
+        const validCredentials = {
+            username: "butwal",
+            password: "construction123"
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === validCredentials.username && password === validCredentials.password) {
+                document.getElementById('loginModal').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                alert('Invalid username or password');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Check if direct access, redirect to login
+        if (window.location.href.indexOf('?') === -1) {
+            document.getElementById('loginModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // --- Input Adjuster ---
+        function adjInput(id, val) {
+            const el = document.getElementById(id);
+            let v = parseInt(el.value) || 0;
+            v = Math.max(0, v + val);
+            el.value = v;
+        }
+
+        // --- Formatters ---
+        const formatMoney = (n) => 'Rs. ' + new Intl.NumberFormat('en-NP', { minimumFractionDigits: 2 }).format(n);
+        const formatQty = (n) => new Intl.NumberFormat('en-NP').format(n);
+
+        // --- Set Current Date ---
+        function setCurrentDate() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-NP', options);
+        }
+
+        // Initialize date when page loads
+        setCurrentDate();
+
+        // --- Area Entries Storage ---
+        let areaEntries = [
+            { id: 1, desc: "Main Building", area: 1000, rate: 3500 }
+        ];
+        let nextAreaId = 2;
+
+        // --- Custom Items Storage ---
+        let customItems = [];
+
+        // --- Database of Items (Based on Competitor's BOQ) ---
+        const itemsDB = [
+            { cat: 'A. GENERAL ITEMS', items: [
+                { desc: "PROJECT HORDING BOARD: Supplying and installation of hording board", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_hording', rate: 0 },
+                { desc: "INSURANCE: Insurance of works, construction equipments and against accident to workmen", unit: "Job", factor: 1, type: 'optional', checkboxId: 'opt_insurance', rate: 0 },
+                { desc: "LABORATORY TEST: Additional lab testing of materials, specimen, mix design etc.", unit: "Job", factor: 1, type: 'optional', checkboxId: 'opt_labtest', rate: 0 }
+            ]},
+            { cat: 'B. CIVIL WORKS', items: [
+                { desc: "PREPERATION OF SITE: Site clearance work including collection of all construction debris", unit: "Job", factor: 1, type: 'fixed', rate: 0 },
+                { desc: "EARTH WORK IN EXCAVATION: Earthwork in excavation for foundation in hard soil", unit: "Cum", factor: 0.15, type: 'area', rate: 250, renovationFactor: 0 },
+                { desc: "EARTH WORK IN BACK FILLING: Earthwork in back filling for foundation", unit: "Cum", factor: 0.12, type: 'area', rate: 0, renovationFactor: 0 },
+                { desc: "SAND FILLING, WATER SPRAYING AND COMPACTION", unit: "Cum", factor: 0.08, type: 'area', rate: 0, renovationFactor: 0 },
+                { desc: "500 GUAGE POLYTHENE SHEET LAYING WORK FOR DAMP PREVENTION", unit: "Sqm", factor: 0.15, type: 'area', rate: 0, renovationFactor: 0 },
+                { desc: "SECOND CLASS CHIMNEY MADE DRY FLAT BRICK SOLING WITH SAND BLENDING", unit: "Sqm", factor: 0.1, type: 'area', rate: 1500, renovationFactor: 0 },
+                { desc: "1:3:6 PCC WORK: Plain cement concrete work in ratio of 1:3:6", unit: "Cum", factor: 0.034, type: 'area', rate: 8500, renovationFactor: 0 },
+                { desc: "PCC FOR RCC (1:1.5:3) WORK: Plain Cement Concrete of grade M20", unit: "Cum", factor: 0.079, type: 'area', rate: 11000, renovationFactor: 0 },
+                { desc: "STEEL WORK: Supply, cut fabricate, place and tie, ribbed High Tensile Reinforcement steel bars (Fe500)", unit: "MT", factor: 0.01, type: 'area', rate: 105000, renovationFactor: 0.003 },
+                { desc: "FORM WORK: Supply, fabricate, place and fix steel or wooden formworks", unit: "Sqm", factor: 0.4, type: 'area', rate: 0, renovationFactor: 0.1 },
+                { desc: "BRICK MASONARY WORK: Providing and laying brick masonary using first class chimeny burnt brick", unit: "Cum", factor: 0.026, type: 'area', rate: 13000, renovationFactor: 0.005 },
+                { desc: "MACHINE MADE BRICK MASONARY WORK IN CEMENT SAND MORTAR (1:4)", unit: "Cum", factor: 0.028, type: 'area', rate: 11500, renovationFactor: 0.005 },
+                { desc: "PLASTER ON WALL: Providing, laying and curing cemet sand plaster work(1:4)", unit: "Sqm", factor: 3.5, type: 'area', rate: 0, renovationFactor: 1.5 },
+                { desc: "PLASTER ON CEILING: Providing, laying and curing plaster work on ceiling, beam and staircase", unit: "Sqm", factor: 0.9, type: 'area', rate: 0, renovationFactor: 0.5 },
+                { desc: "3MM THICK CEMENT PUNNING: 3mm thick 1:1 cement punning on floor", unit: "Sqm", factor: 0.9, type: 'area', rate: 0, renovationFactor: 0.3 },
+                { desc: "PROCELAIN GLAZED TILES FOR WALLS OF BATHROOMS/TOILETS", unit: "Sqm", factor: 0.1, type: 'area', rate: 800, renovationFactor: 0.1 },
+                { desc: "NON GLAZED TILES FOR FLOOR OF BATHROOMS/TOILETS", unit: "Sqm", factor: 0.2, type: 'area', rate: 500, renovationFactor: 0.2 },
+                { desc: "GRANITE WORK: Providing and laying 16 mm thick Granite", unit: "Sqm", factor: 0.2, type: 'area', rate: 1800, renovationFactor: 0.2 },
+                { desc: "PAINTING WORKS: Two coat of Plastic Emulsion paint on inner wall and ceiling", unit: "Sqm", factor: 3.5, type: 'area', rate: 300, renovationFactor: 3.5 },
+                { desc: "WEATHER COAT ON EXTERNAL WALL", unit: "Sqm", factor: 0.8, type: 'area', rate: 330, renovationFactor: 0.8 }
+            ]},
+            { cat: 'C. SANITARY & PLUMBING WORKS', items: [
+                { desc: "CPVC PIPES AND FITTINGS FOR INTERNAL WATER SUPPLY", unit: "Rmt", factor: 0.5, type: 'area', rate: 0 },
+                { desc: "UPVC SOIL WASTE AND VENT PIPES AND FITTINGS", unit: "Rmt", factor: 0.3, type: 'area', rate: 0 },
+                { desc: "PUSH BUTTON FLUSH VALVE FOR WATER CLOSET", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_flushvalve', rate: 0 },
+                { desc: "WATER CLOSET (WC) PANS WITH ACCESSORIES", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_wc', rate: 0 },
+                { desc: "WASH BASIN WITH ACCESSORIES", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_washbasin', rate: 0 },
+                { desc: "SHOWER SET WITH ACCESSORIES", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_shower', rate: 0 },
+                { desc: "OVERHEAD SINKS FOR KITCHEN", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_sink', rate: 0 },
+                { desc: "WATER TANK (1000 LTRS CAPACITY)", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_tank', rate: 0 }
+            ]},
+            { cat: 'D. ELECTRICAL WORKS', items: [
+                { desc: "CONDUIT PIPING FOR INTERNAL WIRING", unit: "Rmt", factor: 1.2, type: 'area', rate: 0 },
+                { desc: "COPPER WIRES FOR INTERNAL WIRING", unit: "Rmt", factor: 1.5, type: 'area', rate: 0 },
+                { desc: "SWITCHES AND SOCKETS", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_switches', rate: 0 },
+                { desc: "CEILING FANS", unit: "Yes", factor: 1, type: 'roomBased', roomTypes: ['bedroom', 'living'], checkboxId: 'opt_fans', rate: 0 },
+                { desc: "LIGHT FITTINGS", unit: "Yes", factor: 1, type: 'optional', checkboxId: 'opt_lights', rate: 0 },
+                { desc: "MCB DISTRIBUTION BOARD", unit: "No", factor: 1, type: 'optional', checkboxId: 'opt_mcb', rate: 0 }
+            ]},
+            { cat: 'E. FINISHING WORKS', items: [
+                { desc: "DOORS AND WINDOWS WITH FRAMES", unit: "Sqm", factor: 0.2, type: 'area', rate: 0 },
+                { desc: "FLOORING TILES FOR LIVING AND BEDROOMS", unit: "Sqm", factor: 0.7, type: 'area', rate: 0 },
+                { desc: "KITCHEN COUNTER TOP", unit: "Rmt", factor: 0.1, type: 'area', rate: 0 },
+                { desc: "WARDROBE AND STORAGE", unit: "Sqm", factor: 0.3, type: 'area', rate: 0 }
+            ]}
+        ];
+
+        // --- Chart Variables ---
+        let costPieChart, materialBarChart;
+
+        // --- Area Entry Functions ---
+        function addAreaEntry() {
+            console.log("Add Area Entry button clicked!"); // Debug log
+            
+            const desc = document.getElementById('areaDesc').value.trim();
+            const area = parseFloat(document.getElementById('areaValue').value) || 0;
+            const rate = parseFloat(document.getElementById('areaRate').value) || 0;
+            
+            console.log("Values:", {desc, area, rate}); // Debug log
+            
+            if (!desc || area <= 0 || rate <= 0) {
+                showToast('Please enter valid description, area, and rate');
+                return;
+            }
+            
+            const newEntry = {
+                id: nextAreaId++,
+                desc: desc,
+                area: area,
+                rate: rate
+            };
+            
+            areaEntries.push(newEntry);
+            updateAreaEntriesList();
+            
+            // Clear inputs
+            document.getElementById('areaDesc').value = '';
+            document.getElementById('areaValue').value = '';
+            document.getElementById('areaRate').value = '';
+            
+            showToast('Area entry added successfully!');
+        }
+        
+        function removeAreaEntry(id) {
+            if (areaEntries.length <= 1) {
+                showToast('At least one area entry is required');
+                return;
+            }
+            
+            areaEntries = areaEntries.filter(entry => entry.id !== id);
+            updateAreaEntriesList();
+            showToast('Area entry removed!');
+        }
+        
+        function updateAreaEntriesList() {
+            const container = document.getElementById('areaEntriesList');
+            container.innerHTML = '';
+            
+            areaEntries.forEach(entry => {
+                const div = document.createElement('div');
+                div.className = 'area-entry';
+                div.setAttribute('data-id', entry.id);
+                div.innerHTML = `
+                    <div class="area-entry-header">
+                        <span class="area-entry-title">${entry.desc}</span>
+                        <button type="button" onclick="removeAreaEntry(${entry.id})" class="remove-area-entry" title="Remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Description</label>
+                            <input type="text" value="${entry.desc}" class="area-desc w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white" onchange="updateAreaEntry(${entry.id}, 'desc', this.value)">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Area (Sq.Ft)</label>
+                            <input type="number" value="${entry.area}" class="area-value w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white" onchange="updateAreaEntry(${entry.id}, 'area', this.value)" oninput="updateAreaSummary()">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 mb-1 block">Rate (NPR/Sq.Ft)</label>
+                            <input type="number" value="${entry.rate}" class="area-rate w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs focus:border-orange-500 focus:outline-none text-white" onchange="updateAreaEntry(${entry.id}, 'rate', this.value)" oninput="updateAreaSummary()">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            updateAreaSummary();
+        }
+        
+        function updateAreaEntry(id, field, value) {
+            const entry = areaEntries.find(e => e.id === id);
+            if (entry) {
+                if (field === 'area' || field === 'rate') {
+                    entry[field] = parseFloat(value) || 0;
+                } else {
+                    entry[field] = value;
+                }
+                updateAreaSummary();
+            }
+        }
+        
+        function updateAreaSummary() {
+            // Calculate totals
+            const totalAreas = areaEntries.length;
+            const totalArea = areaEntries.reduce((sum, entry) => sum + (parseFloat(entry.area) || 0), 0);
+            const totalInvestment = areaEntries.reduce((sum, entry) => sum + ((parseFloat(entry.area) || 0) * (parseFloat(entry.rate) || 0)), 0);
+            const averageRate = totalArea > 0 ? totalInvestment / totalArea : 0;
+            
+            // Update summary display
+            document.getElementById('totalAreasCount').textContent = totalAreas;
+            document.getElementById('totalAreaSum').textContent = formatQty(totalArea.toFixed(2));
+            document.getElementById('averageRate').textContent = formatQty(averageRate.toFixed(2));
+            document.getElementById('totalInvestment').textContent = formatQty(totalInvestment.toFixed(2));
+            
+            // Update total area display
+            document.getElementById('totalAreaDisplay').value = formatQty(totalArea.toFixed(2));
+            
+            // Update area breakdown in report
+            updateAreaBreakdown();
+        }
+        
+        function updateAreaBreakdown() {
+            const container = document.getElementById('areaBreakdownContainer');
+            const tbody = document.getElementById('areaBreakdownBody');
+            
+            tbody.innerHTML = '';
+            
+            let sn = 1;
+            let totalArea = 0;
+            let totalAmount = 0;
+            
+            areaEntries.forEach(entry => {
+                const area = parseFloat(entry.area) || 0;
+                const rate = parseFloat(entry.rate) || 0;
+                const amount = area * rate;
+                
+                totalArea += area;
+                totalAmount += amount;
+                
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-100 hover:bg-slate-50';
+                row.innerHTML = `
+                    <td class="py-2 px-4 border-r border-slate-100 text-slate-500">${sn}</td>
+                    <td class="py-2 px-4 border-r border-slate-100">${entry.desc}</td>
+                    <td class="py-2 px-4 text-center border-r border-slate-100">${formatQty(area.toFixed(2))}</td>
+                    <td class="py-2 px-4 text-center border-r border-slate-100">${formatQty(rate.toFixed(2))}</td>
+                    <td class="py-2 px-4 text-right font-mono">${formatQty(amount.toFixed(2))}</td>
+                `;
+                tbody.appendChild(row);
+                sn++;
+            });
+            
+            const averageRate = totalArea > 0 ? totalAmount / totalArea : 0;
+            
+            document.getElementById('totalAreaFooter').textContent = formatQty(totalArea.toFixed(2));
+            document.getElementById('averageRateFooter').textContent = formatQty(averageRate.toFixed(2));
+            document.getElementById('totalInvestmentFooter').textContent = formatQty(totalAmount.toFixed(2));
+            
+            // Show/hide container based on number of entries
+            if (areaEntries.length > 1) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // --- Material Calculation Functions ---
+        function calculateBricks(totalArea) {
+            const wallThickness = parseFloat(document.getElementById('wallThickness').value) || 0.67;
+            const brickLength = parseFloat(document.getElementById('brickLength').value) || 0.67;
+            const brickHeight = parseFloat(document.getElementById('brickHeight').value) || 0.29;
+            const brickThickness = parseFloat(document.getElementById('brickThickness').value) || 0.22;
+            const wastage = parseFloat(document.getElementById('brickWastage').value) || 10;
+            
+            // Calculate wall volume (simplified calculation)
+            const wallVolume = totalArea * 0.3 * wallThickness; // Assuming 30% of area is walls
+            
+            // Calculate brick volume
+            const brickVolume = brickLength * brickHeight * brickThickness;
+            
+            // Calculate number of bricks
+            const bricksBeforeWastage = wallVolume / brickVolume;
+            const totalBricks = Math.ceil(bricksBeforeWastage * (1 + wastage/100));
+            
+            // Update calculation details
+            document.getElementById('wallVolume').textContent = formatQty(wallVolume.toFixed(2));
+            document.getElementById('brickVolume').textContent = formatQty(brickVolume.toFixed(4));
+            document.getElementById('bricksBeforeWastage').textContent = formatQty(Math.ceil(bricksBeforeWastage));
+            document.getElementById('brickWastagePercent').textContent = wastage;
+            document.getElementById('totalBricks').textContent = formatQty(totalBricks);
+            
+            return totalBricks;
+        }
+
+        function calculateConcrete(totalArea) {
+            const cementRatio = parseFloat(document.getElementById('cementRatio').value) || 1;
+            const sandRatio = parseFloat(document.getElementById('sandRatio').value) || 1.5;
+            const aggregateRatio = parseFloat(document.getElementById('aggregateRatio').value) || 3;
+            const volumeFactor = parseFloat(document.getElementById('concreteVolumeFactor').value) || 0.15;
+            
+            // Calculate concrete volume
+            const wetVolume = totalArea * volumeFactor;
+            const dryVolume = wetVolume * 1.54; // 54% more for dry volume
+            
+            // Calculate components
+            const totalRatio = cementRatio + sandRatio + aggregateRatio;
+            const cementVolume = (cementRatio / totalRatio) * dryVolume;
+            const sandVolume = (sandRatio / totalRatio) * dryVolume;
+            const aggregateVolume = (aggregateRatio / totalRatio) * dryVolume;
+            
+            // Convert to practical units (1 bag cement = 1.25 cu.ft)
+            const cementBags = Math.ceil(cementVolume / 1.25);
+            const sandTons = (sandVolume / 35.315) * 1.6; // Convert cu.ft to cubic meters then to tons
+            const aggregateTons = (aggregateVolume / 35.315) * 1.5;
+            
+            // Update calculation details
+            document.getElementById('concreteRatio').textContent = `${cementRatio}:${sandRatio}:${aggregateRatio}`;
+            document.getElementById('wetVolume').textContent = formatQty(wetVolume.toFixed(2));
+            document.getElementById('dryVolume').textContent = formatQty(dryVolume.toFixed(2));
+            document.getElementById('cementVolume').textContent = formatQty(cementVolume.toFixed(2));
+            document.getElementById('cementBags').textContent = formatQty(cementBags);
+            
+            return {
+                cement: cementBags,
+                sand: sandTons,
+                aggregate: aggregateTons
+            };
+        }
+
+        function calculateSteel(totalArea) {
+            const steelFactor = parseFloat(document.getElementById('steelFactor').value) || 4;
+            const totalSteel = Math.ceil(totalArea * steelFactor);
+            
+            // Update calculation details
+            document.getElementById('builtupArea').textContent = formatQty(totalArea);
+            document.getElementById('steelFactorValue').textContent = steelFactor;
+            document.getElementById('totalSteel').textContent = formatQty(totalSteel);
+            
+            return totalSteel;
+        }
+
+        // --- Custom Items Functions ---
+        function addCustomItem() {
+            const desc = document.getElementById('customDesc').value.trim();
+            const unit = document.getElementById('customUnit').value.trim();
+            const qty = parseFloat(document.getElementById('customQty').value) || 1;
+            
+            if (!desc || !unit) {
+                alert('Please enter both description and unit');
+                return;
+            }
+            
+            const newItem = {
+                id: Date.now(), // Unique ID for removal
+                desc: desc.toUpperCase() + ": Custom item added by user",
+                unit: unit,
+                quantity: qty,
+                type: 'custom'
+            };
+            
+            customItems.push(newItem);
+            
+            // Update the custom items list display
+            updateCustomItemsList();
+            
+            // Clear inputs
+            document.getElementById('customDesc').value = '';
+            document.getElementById('customUnit').value = '';
+            document.getElementById('customQty').value = '1';
+            
+            // Show success message
+            showToast('Custom item added successfully!');
+        }
+        
+        function removeCustomItem(id) {
+            customItems = customItems.filter(item => item.id !== id);
+            updateCustomItemsList();
+            showToast('Custom item removed!');
+        }
+        
+        function updateCustomItemsList() {
+            const container = document.getElementById('customItemsList');
+            container.innerHTML = '';
+            
+            if (customItems.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 text-xs text-center py-2">No custom items added yet</p>';
+                return;
+            }
+            
+            customItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'custom-item-entry';
+                div.innerHTML = `
+                    <div class="custom-item-header">
+                        <span class="custom-item-title">${item.desc.substring(0, 30)}${item.desc.length > 30 ? '...' : ''}</span>
+                        <button type="button" onclick="removeCustomItem(${item.id})" class="remove-custom-item">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="text-xs text-slate-300">
+                        <span class="text-slate-400">Unit:</span> ${item.unit} | 
+                        <span class="text-slate-400">Qty:</span> ${item.quantity}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // --- Main BOQ Generation Function ---
+        function generateBOQ() {
+            // Calculate total area and investment from area entries
+            const totalArea = areaEntries.reduce((sum, entry) => sum + (parseFloat(entry.area) || 0), 0);
+            const grandTotal = areaEntries.reduce((sum, entry) => sum + ((parseFloat(entry.area) || 0) * (parseFloat(entry.rate) || 0)), 0);
+            
+            // Get form values
+            const clientName = document.getElementById('clientName').value || 'Not specified';
+            const projectLocation = document.getElementById('projectLocation').value || 'Not specified';
+            const floors = document.getElementById('floors').value || '1';
+            const nBed = document.getElementById('nBed').value || '0';
+            const nLiv = document.getElementById('nLiv').value || '0';
+            const nKit = document.getElementById('nKit').value || '0';
+            const nBath = document.getElementById('nBath').value || '0';
+            const projectType = document.querySelector('input[name="projectType"]:checked').value;
+            
+            if (totalArea <= 0) {
+                alert('Please enter valid area values');
+                return;
+            }
+
+            // Calculate material quantities
+            const bricks = calculateBricks(totalArea);
+            const concrete = calculateConcrete(totalArea);
+            const steel = calculateSteel(totalArea);
+            const paint = Math.ceil(totalArea * 0.1); // Simplified paint calculation
+
+            // Update display values
+            document.getElementById('dispClient').textContent = clientName;
+            document.getElementById('dispLoc').textContent = projectLocation;
+            document.getElementById('dispArea').textContent = formatQty(totalArea); // This now shows SUM of all areas
+            document.getElementById('dispFloors').textContent = floors;
+            document.getElementById('dispBed').textContent = nBed;
+            document.getElementById('dispLiv').textContent = nLiv;
+            document.getElementById('dispKit').textContent = nKit;
+            document.getElementById('dispBath').textContent = nBath;
+            
+            // Update material quantities display
+            document.getElementById('qtyCement').textContent = formatQty(concrete.cement);
+            document.getElementById('qtySand').textContent = formatQty(concrete.sand.toFixed(1));
+            document.getElementById('qtyAgg').textContent = formatQty(concrete.aggregate.toFixed(1));
+            document.getElementById('qtyBricks').textContent = formatQty(bricks);
+            document.getElementById('qtySteel').textContent = formatQty(steel);
+            document.getElementById('qtyPaint').textContent = formatQty(paint);
+
+            // Update grand total
+            document.getElementById('dispGrandTotal').textContent = formatMoney(grandTotal);
+
+            // Generate BOQ table
+            generateBOQTable(totalArea, projectType, nBed, nLiv, nKit, nBath);
+
+            // Update charts with print-optimized settings
+            updateCharts(totalArea, grandTotal, concrete, bricks, steel, paint);
+
+            // Show the document and hide empty state
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('boqDocument').classList.remove('hidden');
+
+            // Scroll to top of document
+            document.getElementById('boqDocument').scrollIntoView({ behavior: 'smooth' });
+            
+            // Update signatures
+            updateSignatures();
+        }
+
+        function generateBOQTable(totalArea, projectType, nBed, nLiv, nKit, nBath) {
+            const tbody = document.getElementById('boqTableBody');
+            tbody.innerHTML = '';
+            
+            let sn = 1;
+            let totalCost = 0;
+            const costBreakdown = {
+                civil: 0,
+                sanitary: 0,
+                electrical: 0,
+                finishing: 0,
+                miscellaneous: 0
+            };
+
+            // Process regular items from itemsDB
+            itemsDB.forEach(category => {
+                // Add category header row
+                const headerRow = document.createElement('tr');
+                headerRow.className = 'bg-slate-800 text-white font-bold avoid-break';
+                headerRow.innerHTML = `
+                    <td colspan="4" class="py-2 px-4">${category.cat}</td>
+                `;
+                tbody.appendChild(headerRow);
+
+                // Add items for this category
+                category.items.forEach(item => {
+                    let quantity = 0;
+                    let skipItem = false;
+                    
+                    // Check if item is optional and not selected
+                    if (item.type === 'optional' || item.checkboxId) {
+                        const checkbox = document.getElementById(item.checkboxId);
+                        if (checkbox && !checkbox.checked) {
+                            skipItem = true;
+                        }
+                    }
+                    
+                    if (skipItem) {
+                        return; // Skip this item
+                    }
+                    
+                    if (item.type === 'area') {
+                        // Apply renovation factor if it's a renovation project
+                        const factor = projectType === 'renovation' && item.renovationFactor !== undefined ? 
+                                      item.renovationFactor : item.factor;
+                        quantity = totalArea * factor;
+                    } else if (item.type === 'roomBased' && item.roomTypes) {
+                        // Calculate based on room types
+                        if (item.roomTypes.includes('bedroom') && item.roomTypes.includes('living')) {
+                            // For ceiling fans: 1 per bedroom + 1 per living room
+                            quantity = parseInt(nBed) + parseInt(nLiv);
+                        }
+                        // You can add more room-based calculations here as needed
+                    } else if (item.type === 'optional') {
+                        // For optional items, quantity is based on factor
+                        quantity = item.factor;
+                    } else {
+                        // Fixed quantity items
+                        quantity = item.factor;
+                    }
+                    
+                    // Round quantity appropriately
+                    if (quantity >= 10) {
+                        quantity = Math.ceil(quantity);
+                    } else if (quantity > 0) {
+                        quantity = parseFloat(quantity.toFixed(2));
+                    }
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-slate-100 hover:bg-slate-50 avoid-break';
+                    row.innerHTML = `
+                        <td class="py-2 px-4 border-r border-slate-100 text-slate-500">${sn}</td>
+                        <td class="py-2 px-4 border-r border-slate-100">${item.desc}</td>
+                        <td class="py-2 px-4 text-center border-r border-slate-100">${item.unit}</td>
+                        <td class="py-2 px-4 text-right font-mono bg-orange-50">${formatQty(quantity)}</td>
+                    `;
+                    tbody.appendChild(row);
+                    sn++;
+                });
+            });
+            
+            // Add custom items if any
+            if (customItems.length > 0) {
+                // Add custom items category header
+                const customHeaderRow = document.createElement('tr');
+                customHeaderRow.className = 'bg-slate-800 text-white font-bold avoid-break';
+                customHeaderRow.innerHTML = `
+                    <td colspan="4" class="py-2 px-4">F. CUSTOM ITEMS</td>
+                `;
+                tbody.appendChild(customHeaderRow);
+                
+                // Add custom items
+                customItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-slate-100 hover:bg-slate-50 avoid-break';
+                    row.innerHTML = `
+                        <td class="py-2 px-4 border-r border-slate-100 text-slate-500">${sn}</td>
+                        <td class="py-2 px-4 border-r border-slate-100">${item.desc}</td>
+                        <td class="py-2 px-4 text-center border-r border-slate-100">${item.unit}</td>
+                        <td class="py-2 px-4 text-right font-mono bg-orange-50">${formatQty(item.quantity)}</td>
+                    `;
+                    tbody.appendChild(row);
+                    sn++;
+                });
+            }
+        }
+
+        function updateCharts(totalArea, totalInvestment, concrete, bricks, steel, paint) {
+            const ctxPie = document.getElementById('costPieChart').getContext('2d');
+            const ctxBar = document.getElementById('materialBarChart').getContext('2d');
+            
+            // Destroy existing charts if they exist
+            if (costPieChart) costPieChart.destroy();
+            if (materialBarChart) materialBarChart.destroy();
+            
+            // Cost Distribution Pie Chart - Optimized for print
+            costPieChart = new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['Civil Works', 'Sanitary', 'Electrical', 'Finishing', 'Miscellaneous'],
+                    datasets: [{
+                        data: [45, 15, 12, 20, 8],
+                        backgroundColor: [
+                            '#3b82f6', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 10,
+                                usePointStyle: true,
+                                font: {
+                                    size: 11
+                                },
+                                generateLabels: function(chart) {
+                                    // Custom label generation to ensure all labels fit
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => {
+                                            const meta = chart.getDatasetMeta(0);
+                                            const style = meta.controller.getStyle(i);
+                                            
+                                            return {
+                                                text: label,
+                                                fillStyle: style.backgroundColor,
+                                                strokeStyle: style.borderColor,
+                                                lineWidth: style.borderWidth,
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 10,
+                            bottom: 20,
+                            left: 10,
+                            right: 10
+                        }
+                    }
+                }
+            });
+            
+            // Material Quantity Bar Chart
+            materialBarChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Cement (Bags)', 'Sand (Tons)', 'Aggregate (Tons)', 'Bricks', 'Steel (Kg)', 'Paint (Ltr)'],
+                    datasets: [{
+                        label: 'Quantity Required',
+                        data: [
+                            concrete.cement,
+                            concrete.sand,
+                            concrete.aggregate,
+                            bricks / 1000, // Scale down for better visualization
+                            steel / 100,   // Scale down
+                            paint
+                        ],
+                        backgroundColor: [
+                            '#3b82f6', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#f97316'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Quantity'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Core Logic ---
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('boqForm').reset();
+            // Reset checkboxes to checked
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            // Reset area entries to default
+            areaEntries = [{ id: 1, desc: "Main Building", area: 1000, rate: 3500 }];
+            nextAreaId = 2;
+            updateAreaEntriesList();
+            // Clear custom items
+            customItems = [];
+            updateCustomItemsList();
+            
+            document.getElementById('emptyState').classList.remove('hidden');
+            document.getElementById('boqDocument').classList.add('hidden');
+        });
+
+        document.getElementById('boqForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateBOQ();
+        });
+
+        // Add custom item button event listener
+        document.getElementById('addCustomItem').addEventListener('click', addCustomItem);
+
+        // Initialize area entries list
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded"); // Debug log
+            
+            // Initialize area entries
+            updateAreaEntriesList();
+            updateCustomItemsList();
+            
+            // Add event listener for area entry button
+            const addAreaButton = document.getElementById('addAreaEntry');
+            if (addAreaButton) {
+                console.log("Found addAreaEntry button"); // Debug log
+                addAreaButton.addEventListener('click', addAreaEntry);
+            } else {
+                console.error("Could not find addAreaEntry button!");
+            }
+            
+            // Add event listener for custom item button
+            const addCustomItemButton = document.getElementById('addCustomItem');
+            if (addCustomItemButton) {
+                addCustomItemButton.addEventListener('click', addCustomItem);
+            }
+        });
+
+        // PDF Generation with print optimization
+        function generatePDF() {
+            const element = document.getElementById('boqDocument');
+            
+            // Create a clone for PDF generation
+            const elementClone = element.cloneNode(true);
+            
+            // Remove elements that shouldn't be in PDF
+            const elementsToRemove = elementClone.querySelectorAll(
+                '.material-bar-chart, .material-requirements, .calculation-details, .watermark-screen'
+            );
+            elementsToRemove.forEach(el => el.remove());
+            
+            // Optimize chart for PDF
+            const pieChartContainer = elementClone.querySelector('.cost-pie-chart');
+            if (pieChartContainer) {
+                pieChartContainer.style.height = '250px';
+                pieChartContainer.style.marginBottom = '20px';
+            }
+            
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: 'Butwal_Construction_BOQ.pdf',
+                image: { 
+                    type: 'jpeg', 
+                    quality: 0.98 
+                },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    letterRendering: true,
+                    windowHeight: elementClone.scrollHeight
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: { 
+                    mode: ['avoid-all', 'css', 'legacy']
+                }
+            };
+            
+            html2pdf().set(opt).from(elementClone).save();
+        }
+
+        // Update signature names when form is submitted
+        function updateSignatures() {
+            const preparedBy = document.getElementById('preparedBy').value || 'Prepared By';
+            const approvedBy = document.getElementById('approvedBy').value || 'Approved By';
+            
+            document.getElementById('dispPreparedBy').textContent = preparedBy;
+            document.getElementById('dispApprovedBy').textContent = approvedBy;
+        }
+
+        // Select/Deselect all checkboxes
+        function toggleAllCheckboxes(selectAll) {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = selectAll;
+            });
+        }
+    </script>
+</body>
+</html>
