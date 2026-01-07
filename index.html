@@ -37,19 +37,6 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Animated gradient background */
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .animated-gradient {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-        }
-
         /* Smooth transitions */
         .smooth-transition {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -93,18 +80,6 @@
         .btn-ripple:active::after {
             width: 300px;
             height: 300px;
-        }
-
-        /* Skeleton loader */
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        .skeleton {
-            animation: shimmer 2s infinite;
-            background: linear-gradient(to right, #f0f0f0 4%, #f8f8f8 25%, #f0f0f0 36%);
-            background-size: 1000px 100%;
         }
 
         /* Custom checkbox with animation */
@@ -232,7 +207,7 @@
             
             .sidebar-panel, .fab-container, .no-print, 
             .calculation-details, .material-requirements,
-            .material-bar-chart, #areaBreakdownContainer { 
+            .material-bar-chart { 
                 display: none !important; 
             }
             
@@ -265,9 +240,30 @@
                 break-inside: avoid !important;
             }
             
-            /* Hide rate and amount for custom items in print */
-            .custom-item-rate, .custom-item-amount {
-                display: none !important;
+            /* Hide rate columns in print when option is selected */
+            .hide-rates .custom-item-rate, 
+            .hide-rates .custom-item-amount { 
+                display: none !important; 
+            }
+            
+            /* Hide custom items total row in print */
+            .hide-custom-total #customItemsRow { 
+                display: none !important; 
+            }
+            
+            /* Show area breakdown in print if selected */
+            .show-area-breakdown-print #areaBreakdownContainer { 
+                display: block !important; 
+            }
+            
+            /* Show custom items breakdown in print if selected */
+            .show-custom-breakdown-print #customItemsBreakdown { 
+                display: block !important; 
+            }
+            
+            /* Hide the "Show in Print" labels in print */
+            .print-option-label { 
+                display: none !important; 
             }
         }
 
@@ -316,23 +312,6 @@
             border-color: #f97316;
             box-shadow: 0 8px 30px rgba(249, 115, 22, 0.2);
         }
-
-        /* Progress bar for material calculation */
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #f97316, #ea580c);
-            border-radius: 4px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
     </style>
 </head>
 <body class="flex">
@@ -377,7 +356,7 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-xl">Butwal Construction</h1>
-                    <p class="text-slate-400 text-xs mt-1">BOQ System v5</p>
+                    <p class="text-slate-400 text-xs mt-1">BOQ System v4.5</p>
                 </div>
             </div>
             <button id="logoutBtn" class="mt-4 text-xs text-slate-400 hover:text-orange-400 smooth-transition flex items-center gap-2">
@@ -424,8 +403,26 @@
                         <i class="fas fa-layer-group mr-2"></i>Multiple Areas Configuration
                     </label>
                     
+                    <!-- Print Options -->
+                    <div class="mb-4 bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-slate-300">Show Area Breakdown in Print</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="showAreaInPrint" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-300">Hide Rates in Print</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="hideRatesInPrint" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <div class="mb-4 space-y-3">
-                        <input type="text" id="areaDesc" placeholder="Area Description (e.g., Ground Floor)" class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white">
+                        <input type="text" id="areaDesc" placeholder="Area Description (e.g., Ground Floor, Bedroom 1)" class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white">
                         <div class="grid grid-cols-2 gap-3">
                             <input type="number" id="areaValue" placeholder="Area (Sq.Ft)" class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white">
                             <input type="number" id="areaRate" placeholder="Rate (NPR/Sq.Ft)" class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white">
@@ -738,6 +735,18 @@
                     <label class="block text-xs font-bold text-orange-400 uppercase tracking-wider mb-3">
                         <i class="fas fa-plus-circle mr-2"></i>Custom Items (with Rate)
                     </label>
+                    
+                    <!-- Print Option for Custom Items -->
+                    <div class="mb-4 bg-slate-900/50 p-3 rounded-lg border border-slate-700/30">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-300">Show Custom Items in Print</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="showCustomInPrint" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <div class="space-y-3">
                         <input type="text" id="customDesc" placeholder="Item Description" class="w-full bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white">
                         <div class="grid grid-cols-3 gap-2">
@@ -965,8 +974,8 @@
                 </div>
             </div>
 
-            <!-- Area Breakdown -->
-            <div id="areaBreakdownContainer" class="mb-12 no-print">
+            <!-- Area Breakdown (Will show/hide based on print settings) -->
+            <div id="areaBreakdownContainer" class="mb-12">
                 <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
                     <div class="w-2 h-8 bg-gradient-to-b from-orange-600 to-orange-500 rounded-full"></div>
                     Area & Cost Breakdown
@@ -978,7 +987,7 @@
                                 <th class="py-4 px-6 text-left w-16">SN</th>
                                 <th class="py-4 px-6 text-left">Description</th>
                                 <th class="py-4 px-6 text-center w-32">Area (Sq.Ft)</th>
-                                <th class="py-4 px-6 text-center w-32">Rate (NPR)</th>
+                                <th class="py-4 px-6 text-center w-32 rate-column">Rate (NPR)</th>
                                 <th class="py-4 px-6 text-right w-40 bg-orange-600">Amount (NPR)</th>
                             </tr>
                         </thead>
@@ -987,7 +996,7 @@
                             <tr class="bg-gradient-to-r from-slate-900 to-slate-800 text-white font-bold text-lg">
                                 <td colspan="2" class="py-5 px-6 text-right">GRAND TOTAL:</td>
                                 <td id="totalAreaFooter" class="py-5 px-6 text-center"></td>
-                                <td id="averageRateFooter" class="py-5 px-6 text-center"></td>
+                                <td id="averageRateFooter" class="py-5 px-6 text-center rate-column"></td>
                                 <td id="totalInvestmentFooter" class="py-5 px-6 text-right bg-orange-600"></td>
                             </tr>
                         </tfoot>
@@ -1099,6 +1108,34 @@
                     </thead>
                     <tbody id="boqTableBody" class="text-sm"></tbody>
                 </table>
+            </div>
+
+            <!-- Custom Items Breakdown -->
+            <div id="customItemsBreakdown" class="mb-12">
+                <h3 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3 avoid-break">
+                    <div class="w-2 h-8 bg-gradient-to-b from-orange-600 to-orange-500 rounded-full"></div>
+                    Custom Items Summary
+                </h3>
+                <div class="overflow-hidden rounded-xl border-2 border-slate-200 shadow-lg">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-slate-800 to-slate-700 text-white">
+                                <th class="py-4 px-6 text-left w-16">SN</th>
+                                <th class="py-4 px-6 text-left">Item Description</th>
+                                <th class="py-4 px-6 text-center w-24">Unit</th>
+                                <th class="py-4 px-6 text-right w-32">Quantity</th>
+                                <th class="py-4 px-6 text-right w-40 bg-green-600">Total Cost (NPR)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customItemsBreakdownBody" class="text-sm"></tbody>
+                        <tfoot>
+                            <tr class="bg-gradient-to-r from-slate-900 to-slate-800 text-white font-bold text-lg">
+                                <td colspan="4" class="py-5 px-6 text-right">Total Custom Items:</td>
+                                <td id="totalCustomItemsCost" class="py-5 px-6 text-right bg-green-600">Rs. 0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
 
             <!-- Disclaimer -->
@@ -1297,38 +1334,18 @@
                     <td class="py-3 px-6">${idx + 1}</td>
                     <td class="py-3 px-6 font-medium">${entry.desc}</td>
                     <td class="py-3 px-6 text-center">${formatQty(area.toFixed(2))}</td>
-                    <td class="py-3 px-6 text-center">${formatQty(rate.toFixed(2))}</td>
+                    <td class="py-3 px-6 text-center rate-column">${formatQty(rate.toFixed(2))}</td>
                     <td class="py-3 px-6 text-right font-bold text-orange-600">${formatQty(amount.toFixed(2))}</td>
                 `;
                 tbody.appendChild(row);
             });
             
-            // Add custom items row if there are any
-            const existingCustomRow = document.getElementById('customItemsRow');
-            if (existingCustomRow) existingCustomRow.remove();
-            
-            const customTotal = customItems.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
-            if (customItems.length > 0 && customTotal > 0) {
-                const customRow = document.createElement('tr');
-                customRow.id = 'customItemsRow';
-                customRow.className = 'border-t border-slate-700 bg-slate-50';
-                customRow.innerHTML = `
-                    <td colspan="2" class="py-3 px-6 text-right font-medium text-slate-700">Custom Items Total</td>
-                    <td class="py-3 px-6 text-center text-slate-500">-</td>
-                    <td class="py-3 px-6 text-center text-slate-500">-</td>
-                    <td class="py-3 px-6 text-right font-bold text-green-600">${formatQty(customTotal.toFixed(2))}</td>
-                `;
-                tbody.appendChild(customRow);
-            }
-            
-            const totalInv = areaAmount + customTotal;
+            const totalInv = areaAmount;
             const avgRate = totalArea > 0 ? areaAmount / totalArea : 0;
             
             document.getElementById('totalAreaFooter').textContent = formatQty(totalArea.toFixed(2));
             document.getElementById('averageRateFooter').textContent = formatQty(avgRate.toFixed(2));
             document.getElementById('totalInvestmentFooter').textContent = formatQty(totalInv.toFixed(2));
-            
-            document.getElementById('areaBreakdownContainer').classList.toggle('hidden', areaEntries.length <= 1);
         }
 
         // Custom Items
@@ -1394,6 +1411,35 @@
             });
             
             updateAreaSummary();
+        }
+
+        // Update Custom Items Breakdown Display
+        function updateCustomItemsBreakdown() {
+            const tbody = document.getElementById('customItemsBreakdownBody');
+            tbody.innerHTML = '';
+            
+            let totalCustomCost = 0;
+            
+            customItems.forEach((item, idx) => {
+                const amount = item.quantity * item.rate;
+                totalCustomCost += amount;
+                
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-100 hover:bg-slate-50 smooth-transition';
+                row.innerHTML = `
+                    <td class="py-3 px-6">${idx + 1}</td>
+                    <td class="py-3 px-6 font-medium">${item.desc}</td>
+                    <td class="py-3 px-6 text-center">${item.unit}</td>
+                    <td class="py-3 px-6 text-right">${formatQty(item.quantity)}</td>
+                    <td class="py-3 px-6 text-right font-bold text-green-600">${formatMoney(amount)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('totalCustomItemsCost').textContent = formatMoney(totalCustomCost);
+            
+            // Show/hide custom items breakdown based on whether there are custom items
+            document.getElementById('customItemsBreakdown').classList.toggle('hidden', customItems.length === 0);
         }
 
         // Material Calculations
@@ -1486,6 +1532,41 @@
         // Chart Variables
         let costPieChart, materialBarChart;
 
+        // Print Handling
+        function handlePrintOptions() {
+            const boqDocument = document.getElementById('boqDocument');
+            const showAreaInPrint = document.getElementById('showAreaInPrint').checked;
+            const hideRatesInPrint = document.getElementById('hideRatesInPrint').checked;
+            const showCustomInPrint = document.getElementById('showCustomInPrint').checked;
+            
+            // Apply or remove classes based on options
+            if (showAreaInPrint) {
+                boqDocument.classList.add('show-area-breakdown-print');
+            } else {
+                boqDocument.classList.remove('show-area-breakdown-print');
+            }
+            
+            if (hideRatesInPrint) {
+                boqDocument.classList.add('hide-rates');
+                // Hide rate columns in area breakdown table
+                document.querySelectorAll('.rate-column').forEach(el => {
+                    el.style.display = 'none';
+                });
+            } else {
+                boqDocument.classList.remove('hide-rates');
+                // Show rate columns in area breakdown table
+                document.querySelectorAll('.rate-column').forEach(el => {
+                    el.style.display = '';
+                });
+            }
+            
+            if (showCustomInPrint) {
+                boqDocument.classList.add('show-custom-breakdown-print');
+            } else {
+                boqDocument.classList.remove('show-custom-breakdown-print');
+            }
+        }
+
         // Generate BOQ
         function generateBOQ() {
             const totalArea = areaEntries.reduce((sum, e) => sum + (parseFloat(e.area) || 0), 0);
@@ -1497,6 +1578,9 @@
                 showToast('Please enter valid area', true);
                 return;
             }
+
+            // Get print options
+            handlePrintOptions();
 
             const clientName = document.getElementById('clientName').value || 'Not specified';
             const projectLocation = document.getElementById('projectLocation').value || 'Not specified';
@@ -1535,7 +1619,12 @@
             document.getElementById('dispCustomTotal').textContent = formatMoney(customTotal);
             document.getElementById('dispCombinedTotal').textContent = formatMoney(grandTotal);
 
-            generateBOQTable(totalArea, projectType, nBed, nLiv, nKit, nBath);
+            // Update custom items breakdown
+            updateCustomItemsBreakdown();
+
+            // Generate BOQ table with rate hiding option
+            const hideRatesInPrint = document.getElementById('hideRatesInPrint').checked;
+            generateBOQTable(totalArea, projectType, nBed, nLiv, nKit, nBath, hideRatesInPrint);
             updateCharts(totalArea, grandTotal, concrete, bricks, steel, paint);
 
             document.getElementById('emptyState').classList.add('hidden');
@@ -1546,15 +1635,26 @@
             showToast('BOQ generated successfully!');
         }
 
-        function generateBOQTable(totalArea, projectType, nBed, nLiv, nKit, nBath) {
+        function generateBOQTable(totalArea, projectType, nBed, nLiv, nKit, nBath, hideRates = false) {
             const tbody = document.getElementById('boqTableBody');
             tbody.innerHTML = '';
             let sn = 1;
 
+            // Hide rate and amount columns if needed
+            if (hideRates) {
+                document.querySelectorAll('.custom-item-rate, .custom-item-amount').forEach(el => {
+                    el.classList.add('hidden');
+                });
+            } else {
+                document.querySelectorAll('.custom-item-rate, .custom-item-amount').forEach(el => {
+                    el.classList.remove('hidden');
+                });
+            }
+
             itemsDB.forEach(category => {
                 const headerRow = document.createElement('tr');
                 headerRow.className = 'bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold avoid-break';
-                headerRow.innerHTML = `<td colspan="6" class="py-3 px-6">${category.cat}</td>`;
+                headerRow.innerHTML = `<td colspan="${hideRates ? '4' : '6'}" class="py-3 px-6">${category.cat}</td>`;
                 tbody.appendChild(headerRow);
 
                 category.items.forEach(item => {
@@ -1604,8 +1704,10 @@
                         <td class="py-3 px-6">${item.desc}</td>
                         <td class="py-3 px-6 text-center">${item.unit}</td>
                         <td class="py-3 px-6 text-right font-mono">${formatQty(quantity)}</td>
-                        <td class="py-3 px-6 text-right font-mono ${rate > 0 ? 'text-blue-600 font-semibold' : 'text-slate-400'} custom-item-rate">${rate > 0 ? formatQty(rate.toFixed(2)) : '-'}</td>
-                        <td class="py-3 px-6 text-right font-mono font-bold ${amount > 0 ? 'text-orange-600' : 'text-slate-400'} custom-item-amount">${amount > 0 ? formatQty(amount.toFixed(2)) : '-'}</td>
+                        ${!hideRates ? `
+                            <td class="py-3 px-6 text-right font-mono ${rate > 0 ? 'text-blue-600 font-semibold' : 'text-slate-400'} custom-item-rate">${rate > 0 ? formatQty(rate.toFixed(2)) : '-'}</td>
+                            <td class="py-3 px-6 text-right font-mono font-bold ${amount > 0 ? 'text-orange-600' : 'text-slate-400'} custom-item-amount">${amount > 0 ? formatQty(amount.toFixed(2)) : '-'}</td>
+                        ` : ''}
                     `;
                     tbody.appendChild(row);
                     sn++;
@@ -1616,7 +1718,7 @@
             if (customItems.length > 0) {
                 const customHeaderRow = document.createElement('tr');
                 customHeaderRow.className = 'bg-gradient-to-r from-slate-800 to-slate-700 text-white font-bold avoid-break';
-                customHeaderRow.innerHTML = `<td colspan="6" class="py-3 px-6">F. CUSTOM ITEMS</td>`;
+                customHeaderRow.innerHTML = `<td colspan="${hideRates ? '4' : '6'}" class="py-3 px-6">F. CUSTOM ITEMS</td>`;
                 tbody.appendChild(customHeaderRow);
                 
                 customItems.forEach(item => {
@@ -1629,15 +1731,15 @@
                         <td class="py-3 px-6">${item.desc}</td>
                         <td class="py-3 px-6 text-center">${item.unit}</td>
                         <td class="py-3 px-6 text-right font-mono">${formatQty(item.quantity)}</td>
-                        <td class="py-3 px-6 text-right font-mono ${item.rate > 0 ? 'text-blue-600 font-semibold' : 'text-slate-400'} custom-item-rate">${item.rate > 0 ? formatQty(item.rate.toFixed(2)) : '-'}</td>
-                        <td class="py-3 px-6 text-right font-mono font-bold ${amount > 0 ? 'text-orange-600' : 'text-slate-400'} custom-item-amount">${amount > 0 ? formatQty(amount.toFixed(2)) : '-'}</td>
+                        ${!hideRates ? `
+                            <td class="py-3 px-6 text-right font-mono ${item.rate > 0 ? 'text-blue-600 font-semibold' : 'text-slate-400'} custom-item-rate">${item.rate > 0 ? formatQty(item.rate.toFixed(2)) : '-'}</td>
+                            <td class="py-3 px-6 text-right font-mono font-bold ${amount > 0 ? 'text-orange-600' : 'text-slate-400'} custom-item-amount">${amount > 0 ? formatQty(amount.toFixed(2)) : '-'}</td>
+                        ` : ''}
                     `;
                     tbody.appendChild(row);
                     sn++;
                 });
             }
-            
-            // Removed the "GRAND TOTAL (Including Custom Items)" row from here
         }
 
         function updateCharts(totalArea, totalInvestment, concrete, bricks, steel, paint) {
@@ -1724,6 +1826,11 @@
 
         document.getElementById('addCustomItem').addEventListener('click', addCustomItem);
         document.getElementById('addAreaEntry').addEventListener('click', addAreaEntry);
+
+        // Add event listeners for print options
+        document.getElementById('showAreaInPrint').addEventListener('change', handlePrintOptions);
+        document.getElementById('hideRatesInPrint').addEventListener('change', handlePrintOptions);
+        document.getElementById('showCustomInPrint').addEventListener('change', handlePrintOptions);
 
         // Initialize
         updateAreaEntriesList();
