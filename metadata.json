@@ -1,0 +1,6 @@
+{
+  "name": "Butwal Construction BOQ System",
+  "description": "Professional Bill of Quantities (BOQ) and construction cost estimation system with material calculations, dynamic area entries, and reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,187 @@
+{
+  "entities": {
+    "projectEstimate": {
+      "title": "Project Estimate",
+      "description": "Saved BOQ calculation progress, configuration, and client details",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique estimate identifier"
+        },
+        "clientName": {
+          "type": "string",
+          "description": "Name of the client",
+          "maxLength": 150
+        },
+        "projectLocation": {
+          "type": "string",
+          "description": "Location of the project",
+          "maxLength": 200
+        },
+        "projectType": {
+          "type": "string",
+          "description": "Project classification",
+          "enum": ["residential", "commercial", "renovation", "new"]
+        },
+        "floors": {
+          "type": "string",
+          "description": "Selected number of floors"
+        },
+        "preparedBy": {
+          "type": "string",
+          "description": "Person preparing the estimate",
+          "maxLength": 100
+        },
+        "approvedBy": {
+          "type": "string",
+          "description": "Approving authority / Director",
+          "maxLength": 100
+        },
+        "columnWidth": {
+          "type": "number",
+          "description": "Column width in inches"
+        },
+        "columnDepth": {
+          "type": "number",
+          "description": "Column depth in inches"
+        },
+        "footingLength": {
+          "type": "number",
+          "description": "Footing length in feet"
+        },
+        "footingWidth": {
+          "type": "number",
+          "description": "Footing width in feet"
+        },
+        "footingDepth": {
+          "type": "number",
+          "description": "Footing excavation depth in feet"
+        },
+        "includeWaterTank": {
+          "type": "boolean",
+          "description": "Whether underground water tank is included"
+        },
+        "tankLength": {
+          "type": "number",
+          "description": "Water tank length in feet"
+        },
+        "tankWidth": {
+          "type": "number",
+          "description": "Water tank width in feet"
+        },
+        "tankHeight": {
+          "type": "number",
+          "description": "Water tank height in feet"
+        },
+        "includeSepticTank": {
+          "type": "boolean",
+          "description": "Whether septic tank with soak pit partition is included"
+        },
+        "septicLength": {
+          "type": "number",
+          "description": "Septic tank length in feet"
+        },
+        "septicWidth": {
+          "type": "number",
+          "description": "Septic tank width in feet"
+        },
+        "septicHeight": {
+          "type": "number",
+          "description": "Septic tank height in feet"
+        },
+        "nBed": {
+          "type": "number",
+          "description": "Number of bedrooms"
+        },
+        "nLiv": {
+          "type": "number",
+          "description": "Number of living rooms"
+        },
+        "nKit": {
+          "type": "number",
+          "description": "Number of kitchens"
+        },
+        "nBath": {
+          "type": "number",
+          "description": "Number of bathrooms"
+        },
+        "totalModularKitchens": {
+          "type": "number",
+          "description": "Total number of modular kitchens across all floors"
+        },
+        "totalWardrobes": {
+          "type": "number",
+          "description": "Total number of bedroom built-in wardrobes across all floors"
+        },
+        "totalBuiltupArea": {
+          "type": "number",
+          "description": "Total built-up area in Sq.Ft"
+        },
+        "grandTotal": {
+          "type": "number",
+          "description": "Grand total investment in NPR"
+        },
+        "floorConfigurations": {
+          "type": "string",
+          "description": "JSON stringified floor-wise area entries"
+        },
+        "customItems": {
+          "type": "string",
+          "description": "JSON stringified custom items array"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["clientName", "totalBuiltupArea", "grandTotal", "createdAt"]
+    },
+    "adminUser": {
+      "title": "Admin User",
+      "description": "Authorized engineering and management credentials stored in Firestore backend",
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Unique username or ID for authentication",
+          "maxLength": 50
+        },
+        "password": {
+          "type": "string",
+          "description": "Password or hash for the user account",
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "description": "User access role (e.g. Admin, Senior Engineer, Project Manager)",
+          "maxLength": 50
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the engineer/admin",
+          "maxLength": 100
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["username", "password"]
+    }
+  },
+  "firestore": {
+    "/estimates/{estimateId}": {
+      "schema": "projectEstimate",
+      "description": "Collection of saved BOQ project estimates"
+    },
+    "/admin_users/{userId}": {
+      "schema": "adminUser",
+      "description": "Collection of authenticated administrative and engineering credentials"
+    }
+  }
+}

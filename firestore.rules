@@ -1,0 +1,36 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Validation helper for estimates
+    function isValidEstimate(data) {
+      return data.clientName is string && data.clientName.size() <= 200 &&
+             data.totalBuiltupArea is number && data.totalBuiltupArea >= 0 &&
+             data.grandTotal is number && data.grandTotal >= 0;
+    }
+
+    // Validation helper for admin users
+    function isValidAdminUser(data) {
+      return data.username is string && data.username.size() > 0 && data.username.size() <= 50 &&
+             data.password is string && data.password.size() > 0 && data.password.size() <= 100;
+    }
+
+    match /estimates/{estimateId} {
+      allow read, list: if true;
+      allow create: if isValidEstimate(request.resource.data);
+      allow update: if isValidEstimate(request.resource.data);
+      allow delete: if true;
+    }
+
+    match /admin_users/{userId} {
+      allow read, list: if true;
+      allow create: if isValidAdminUser(request.resource.data);
+      allow update: if isValidAdminUser(request.resource.data);
+      allow delete: if true;
+    }
+  }
+}
