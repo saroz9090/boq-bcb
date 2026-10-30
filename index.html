@@ -483,6 +483,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
+                    <button type="button" onclick="window.toggleSidebarFullscreen()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold px-2 py-1.5 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1" title="Toggle Fullscreen Sidebar (Focus Mode)">
+                        <i id="sidebarExpandIcon" class="fas fa-expand text-orange-400 text-xs"></i> <span id="sidebarExpandText" class="hidden sm:inline">Focus</span>
+                    </button>
                     <button type="button" onclick="triggerCreateNewBoq()" class="bg-emerald-600/25 hover:bg-emerald-600 text-emerald-300 hover:text-white text-[11px] font-semibold px-2 py-1.5 rounded-lg border border-emerald-500/40 smooth-transition flex items-center gap-1" title="Start a fresh, new BOQ project">
                         <i class="fas fa-plus text-xs"></i> New BOQ
                     </button>
@@ -930,23 +933,34 @@
                         <!-- Footing Size -->
                         <div class="bg-slate-900/70 p-2.5 rounded-lg border border-slate-700/50">
                             <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[10px] text-orange-300 font-bold"><i class="fas fa-shoe-prints mr-1"></i> Footing Size</span>
+                                <span id="footingSizeLabelText" class="text-[10px] text-orange-300 font-bold"><i class="fas fa-shoe-prints mr-1"></i> Footing Size (Per Column L×W×D)</span>
                                 <span class="text-[9px] bg-slate-800 text-slate-300 px-1 rounded">Feet</span>
                             </div>
                             <div class="grid grid-cols-3 gap-1">
                                 <div>
-                                    <label class="text-[9px] text-slate-400 block">L (ft)</label>
+                                    <label class="text-[9px] text-slate-400 block" id="lblFootingL">L (ft)</label>
                                     <input type="number" id="footingL" value="5" min="3" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-1 py-1 text-xs text-white font-bold text-center outline-none">
                                 </div>
                                 <div>
-                                    <label class="text-[9px] text-slate-400 block">W (ft)</label>
+                                    <label class="text-[9px] text-slate-400 block" id="lblFootingW">W (ft)</label>
                                     <input type="number" id="footingW" value="5" min="3" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-1 py-1 text-xs text-white font-bold text-center outline-none">
                                 </div>
                                 <div>
-                                    <label class="text-[9px] text-slate-400 block">D (ft)</label>
+                                    <label class="text-[9px] text-slate-400 block" id="lblFootingD">D (ft)</label>
                                     <input type="number" id="footingD" value="5" min="3" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-1 py-1 text-xs text-white font-bold text-center outline-none">
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Footing Mat Option (RCC Bottom Mesh / Raft Mat) -->
+                        <div class="mt-2.5 bg-slate-900/80 p-2.5 rounded-lg border border-orange-500/40">
+                            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-200">
+                                <input type="checkbox" id="includeFootingMat" class="rounded text-orange-600 focus:ring-0 bg-slate-800 border-slate-600" onchange="window.updateFootingSizeLabel(); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ(); if(window.autoSaveToCloudBackground) window.autoSaveToCloudBackground();">
+                                <div>
+                                    <span class="font-bold text-orange-300 block text-[10.5px]">Include Footing Mat (Raft Mat Foundation)</span>
+                                    <span class="text-[8.5px] text-slate-400 block">Uses full building L×W footprint for continuous monolithic raft slab</span>
+                                </div>
+                            </label>
                         </div>
                     </div>
 
@@ -5234,6 +5248,7 @@
             const effectivePlinth = isFootingExcluded ? 0 : stats.gfWallArea;
             const effectiveNumFloors = stats.isGfExisting ? Math.max(1, stats.activeFloorsCount) : floorSelVal;
 
+            const includeFootingMat = document.getElementById('includeFootingMat')?.checked ?? true;
             const mat = calculateExactMaterials(
                 effectiveBuiltup, 
                 effectivePlinth, 
@@ -5242,7 +5257,8 @@
                 isTinTopFloor,
                 stats.excludeFoundation,
                 stats.excludeStructure,
-                stats.isGfExisting
+                stats.isGfExisting,
+                includeFootingMat
             );
 
             // Update sidebar material card
@@ -5599,7 +5615,8 @@
             isTinTopFloor = false, 
             excludeFoundation = false, 
             excludeStructure = false, 
-            isExistingGf = false
+            isExistingGf = false,
+            includeFootingMat = true
         ) {
             const wastage = 1.10;
             const safeColCount = Math.max(1, parseInt(columnCount) || 9);
@@ -5616,23 +5633,49 @@
             }
 
             const isFndExcluded = excludeFoundation || isExistingGf;
+            const includeMat = (includeFootingMat === true);
             const effectiveGfPlinth = isFndExcluded ? 0 : (gfPlinth || 0);
 
             // Bricks: 9" outer wall (0.018 cum/sqft) + 4.5" partition wall (0.010 cum/sqft) @ 510 bricks/cum = 14.28 bricks/sqft builtup
             // Plus Flat Brick Soling in foundation trenches & ground plinth @ 3.07 bricks/sqft of GF plinth (0 if foundation excluded)
             const bricks = excludeStructure ? 0 : Math.ceil(((totalBuiltup * 14.28) + (effectiveGfPlinth * 3.07)) * wastage);
 
-            // Physical volumes per column: 0 for footings if foundation excluded or GF is existing
-            const footingVolPerColCum = isFndExcluded ? 0 : ((footingL * footingW * 1.20) / 35.315);
-            const footingPccPerColCum = isFndExcluded ? 0 : ((footingL * footingW * 0.25) / 35.315);
-            const footingRebarPerColKg = isFndExcluded ? 0 : 70;
+            let footingVolPerColCum = 0;
+            let footingPccPerColCum = 0;
+            let footingRebarPerColKg = 0;
+            let totalFootingRccCum = 0;
+            let totalFootingPccCum = 0;
+            let totalFootingSteelKg = 0;
+
+            if (!isFndExcluded) {
+                if (includeMat) {
+                    // Raft Mat Foundation (Continuous monolithic slab across building footprint L x W & thickness D)
+                    const matArea = footingL * footingW; // Building footprint length x width (e.g. 30' x 40')
+                    const matThicknessFt = footingD; // Slab thickness in feet (e.g. 0.75ft or 1.0ft)
+                    const raftConcCum = (matArea * matThicknessFt) / 35.315;
+                    const raftPccCum = (matArea * 0.25) / 35.315; // 3" PCC blinding under raft
+
+                    totalFootingRccCum = raftConcCum * wastage;
+                    totalFootingPccCum = raftPccCum * wastage;
+                    totalFootingSteelKg = matArea * 4.2 * wastage; // ~4.2 kg steel per sq.ft for heavy 2-way mat reinforcement
+                } else {
+                    // Isolated Footings per column
+                    footingVolPerColCum = ((footingL * footingW * footingD) / 35.315);
+                    footingPccPerColCum = ((footingL * footingW * 0.25) / 35.315);
+                    footingRebarPerColKg = 70;
+
+                    totalFootingRccCum = safeColCount * footingVolPerColCum * wastage;
+                    totalFootingPccCum = safeColCount * footingPccPerColCum * wastage;
+                    totalFootingSteelKg = safeColCount * footingRebarPerColKg * wastage;
+                }
+            }
 
             // Vertical column shafts across active storeys (10 ft height per floor)
             const columnShaftVolPerColCum = excludeStructure ? 0 : ((safeFloors * ((colWidth / 12) * (colDepth / 12) * 10)) / 35.315);
 
             // Column Count Dynamic Scaling (Benchmark reference: 9 columns for standard 3x3 bay)
             const colDiff = safeColCount - 9;
-            const totalRccVolPerCol = footingVolPerColCum + columnShaftVolPerColCum;
+            const totalRccVolPerCol = includeMat ? columnShaftVolPerColCum : (footingVolPerColCum + columnShaftVolPerColCum);
             const deltaCementBags = excludeStructure ? 0 : colDiff * ((totalRccVolPerCol * 7.6) + (footingPccPerColCum * 5.5));
             const deltaSteelKg = excludeStructure ? 0 : colDiff * (footingRebarPerColKg + (safeFloors * 55));
             const deltaSandTons = excludeStructure ? 0 : colDiff * ((totalRccVolPerCol * 0.72) + (footingPccPerColCum * 0.77));
@@ -6145,6 +6188,7 @@
             const isTinTopFloor = topRoofTypeEl ? topRoofTypeEl.value === 'tin' : false;
             const safeColCountVal = Math.max(1, parseInt(columnCount) || 9);
             const safeFloorsVal = activeFloors;
+            const includeFootingMat = document.getElementById('includeFootingMat')?.checked ?? true;
             const materials = calculateExactMaterials(
                 activeBuiltup, 
                 gfPlinth, 
@@ -6158,7 +6202,8 @@
                 isTinTopFloor,
                 excludeFoundation,
                 excludeStructure,
-                isExistingGf
+                isExistingGf,
+                includeFootingMat
             );
             document.getElementById('qtyCement').textContent = formatQty(materials.cementBags);
             document.getElementById('qtySand').textContent = formatQty(materials.sandTons);
@@ -8460,11 +8505,55 @@
         applyPrintDisplaySettings();
         updateLiveCalculations();
 
+        let isSidebarFullscreen = false;
+        window.toggleSidebarFullscreen = function() {
+            const sidebar = document.querySelector('.sidebar-panel');
+            const icon = document.getElementById('sidebarExpandIcon');
+            const text = document.getElementById('sidebarExpandText');
+            isSidebarFullscreen = !isSidebarFullscreen;
+            if (isSidebarFullscreen) {
+                sidebar.classList.remove('w-[460px]');
+                sidebar.classList.add('fixed', 'inset-0', 'w-full', 'max-w-none', 'h-full', 'z-50');
+                if (icon) icon.className = 'fas fa-compress text-orange-400 text-xs';
+                if (text) text.textContent = 'Restore';
+                showToast('Sidebar expanded to Full Screen (Focus Mode)');
+            } else {
+                sidebar.classList.remove('fixed', 'inset-0', 'w-full', 'max-w-none', 'h-full', 'z-50');
+                sidebar.classList.add('w-[460px]');
+                if (icon) icon.className = 'fas fa-expand text-orange-400 text-xs';
+                if (text) text.textContent = 'Focus';
+                showToast('Sidebar restored to normal view');
+            }
+        };
+
+        window.updateFootingSizeLabel = function() {
+            const isMat = document.getElementById('includeFootingMat')?.checked;
+            const labelEl = document.getElementById('footingSizeLabelText');
+            const lLbl = document.getElementById('lblFootingL');
+            const wLbl = document.getElementById('lblFootingW');
+            const dLbl = document.getElementById('lblFootingD');
+            if (labelEl) {
+                if (isMat) {
+                    labelEl.innerHTML = '<i class="fas fa-layer-group mr-1 text-orange-400"></i> Raft Mat Footprint (Total Building L × W & Slab Thickness D)';
+                    if (lLbl) lLbl.textContent = 'Building L (ft)';
+                    if (wLbl) wLbl.textContent = 'Building W (ft)';
+                    if (dLbl) dLbl.textContent = 'Mat Thk (ft)';
+                } else {
+                    labelEl.innerHTML = '<i class="fas fa-shoe-prints mr-1 text-orange-400"></i> Footing Size (Per Column L × W × D)';
+                    if (lLbl) lLbl.textContent = 'L (ft)';
+                    if (wLbl) lLbl.textContent = 'W (ft)';
+                    if (dLbl) dLbl.textContent = 'D (ft)';
+                }
+            }
+        };
+        window.updateFootingSizeLabel();
+
         // Restore any existing autosave cache immediately so user never loses state
         try {
             const autosaveDraft = localStorage.getItem('boq_autosave_state');
             if (autosaveDraft) {
                 window.restoreEstimate(JSON.parse(autosaveDraft));
+                window.updateFootingSizeLabel();
             }
         } catch(e) {
             console.log("No previous auto-save draft found");
