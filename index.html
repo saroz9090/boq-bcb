@@ -953,7 +953,7 @@
                         </div>
 
                         <!-- Footing Mat Option (RCC Bottom Mesh / Raft Mat) -->
-                        <div class="mt-2.5 bg-slate-900/80 p-2.5 rounded-lg border border-orange-500/40">
+                        <div class="mt-2.5 bg-slate-900/80 p-2.5 rounded-lg border border-orange-500/40 space-y-1.5">
                             <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-200">
                                 <input type="checkbox" id="includeFootingMat" class="rounded text-orange-600 focus:ring-0 bg-slate-800 border-slate-600" onchange="window.updateFootingSizeLabel(); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ(); if(window.autoSaveToCloudBackground) window.autoSaveToCloudBackground();">
                                 <div>
@@ -961,6 +961,10 @@
                                     <span class="text-[8.5px] text-slate-400 block">Uses full building L×W footprint for continuous monolithic raft slab</span>
                                 </div>
                             </label>
+                            <div id="raftMatHint" class="hidden p-2 bg-orange-950/70 border border-orange-500/60 rounded text-[9.5px] text-orange-200 leading-tight">
+                                <i class="fas fa-info-circle text-orange-400 mr-1"></i>
+                                <strong>Raft Mat Mode:</strong> Enter <strong>Building Length</strong> (e.g. 35 ft), <strong>Building Width</strong> (e.g. 25 ft), and <strong>Slab Thickness</strong> in feet (e.g. 0.75 for 9", or 1.0 for 12").
+                            </div>
                         </div>
                     </div>
 
@@ -1337,6 +1341,127 @@
                     </div>
                 </div>
 
+                <!-- Heavy Duty Machinery & Plant Equipment (Optional) -->
+                <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-[11px] font-bold text-orange-400 uppercase tracking-wider">
+                            <i class="fas fa-truck-monster mr-1.5"></i>Heavy Duty Machinery & Plant
+                        </label>
+                        <span class="text-[9px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-mono">Optional Plant</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-tight">Tick required machinery (all unchecked by default):</p>
+                    
+                    <div class="space-y-2 pt-1 text-xs">
+                        <!-- 1. RMC -->
+                        <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+                                <input type="checkbox" id="mach_rmc_enabled" class="rounded text-orange-600 bg-slate-800 border-slate-600 focus:ring-0" onchange="window.toggleMachineryInputs('rmc'); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <span class="font-semibold text-orange-300 text-[11px]">Ready Mix Concrete (RMC) Supply & Pump</span>
+                            </label>
+                            <div id="mach_rmc_box" class="hidden grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Quantity (Cum)</label>
+                                    <input type="number" id="mach_rmc_qty" value="50" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Rate (NPR / Cum)</label>
+                                    <input type="number" id="mach_rmc_rate" value="12500" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Excavator / JCB -->
+                        <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+                                <input type="checkbox" id="mach_jcb_enabled" class="rounded text-orange-600 bg-slate-800 border-slate-600 focus:ring-0" onchange="window.toggleMachineryInputs('jcb'); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <span class="font-semibold text-slate-200 text-[11px]">Hydraulic Excavator / JCB</span>
+                            </label>
+                            <div id="mach_jcb_box" class="hidden grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Hours</label>
+                                    <input type="number" id="mach_jcb_qty" value="16" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Rate (NPR / Hr)</label>
+                                    <input type="number" id="mach_jcb_rate" value="2500" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Concrete Pump / Boom Placer -->
+                        <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+                                <input type="checkbox" id="mach_pump_enabled" class="rounded text-orange-600 bg-slate-800 border-slate-600 focus:ring-0" onchange="window.toggleMachineryInputs('pump'); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <span class="font-semibold text-slate-200 text-[11px]">Mobile Concrete Pump / Boom Placer</span>
+                            </label>
+                            <div id="mach_pump_box" class="hidden grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Slabs / Jobs</label>
+                                    <input type="number" id="mach_pump_qty" value="3" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Rate (NPR / Job)</label>
+                                    <input type="number" id="mach_pump_rate" value="18000" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Tower Crane / Hoist -->
+                        <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+                                <input type="checkbox" id="mach_crane_enabled" class="rounded text-orange-600 bg-slate-800 border-slate-600 focus:ring-0" onchange="window.toggleMachineryInputs('crane'); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <span class="font-semibold text-slate-200 text-[11px]">Tower Crane / Material Hoist Lift</span>
+                            </label>
+                            <div id="mach_crane_box" class="hidden grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Months</label>
+                                    <input type="number" id="mach_crane_qty" value="4" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Rate (NPR / Mo)</label>
+                                    <input type="number" id="mach_crane_rate" value="45000" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Vibratory Roller -->
+                        <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+                                <input type="checkbox" id="mach_roller_enabled" class="rounded text-orange-600 bg-slate-800 border-slate-600 focus:ring-0" onchange="window.toggleMachineryInputs('roller'); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <span class="font-semibold text-slate-200 text-[11px]">Vibratory Soil Compactor / Roller</span>
+                            </label>
+                            <div id="mach_roller_box" class="hidden grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Days</label>
+                                    <input type="number" id="mach_roller_qty" value="3" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Rate (NPR / Day)</label>
+                                    <input type="number" id="mach_roller_rate" value="8500" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. Diesel Generator Set -->
+                        <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-700/60 space-y-1.5">
+                            <label class="flex items-center gap-2 cursor-pointer text-slate-200">
+                                <input type="checkbox" id="mach_dg_enabled" class="rounded text-orange-600 bg-slate-800 border-slate-600 focus:ring-0" onchange="window.toggleMachineryInputs('dg'); window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <span class="font-semibold text-slate-200 text-[11px]">Diesel Generator Set (Power Backup)</span>
+                            </label>
+                            <div id="mach_dg_box" class="hidden grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Months</label>
+                                    <input type="number" id="mach_dg_qty" value="3" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-400 block">Rate (NPR / Mo)</label>
+                                    <input type="number" id="mach_dg_rate" value="12000" oninput="window.updateLiveCalculations(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Custom Items -->
                 <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-2.5">
                     <label class="block text-[11px] font-bold text-orange-400 uppercase tracking-wider">
@@ -1609,6 +1734,42 @@
                             </div>
                         </div>
                     </details>
+                </div>
+
+                <!-- Warranty & Guarantee Terms (Optional, Unchecked by Default) -->
+                <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-orange-400 uppercase tracking-wider">
+                            <input type="checkbox" id="includeWarranty" class="rounded text-orange-600 focus:ring-0 bg-slate-900 border-slate-700 cursor-pointer" onchange="window.toggleWarrantyOptions(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                            <span><i class="fas fa-shield-alt mr-1"></i>Warranty & Guarantee</span>
+                        </label>
+                        <span class="text-[9px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-mono">Optional</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-tight">Unchecked by default. Tick to include Structural (5-Yr / Custom) &amp; Brand Warranty terms in the BOQ.</p>
+
+                    <div id="warrantyOptionsBox" class="hidden space-y-2.5 pt-2 border-t border-slate-700/60">
+                        <div>
+                            <label class="text-[9px] text-slate-300 font-semibold block mb-1">Structural Warranty (RCC Structure &amp; Foundation):</label>
+                            <div class="grid grid-cols-1 gap-2">
+                                <select id="structuralWarrantyDuration" onchange="window.onStructuralWarrantyChange()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-orange-300 font-bold outline-none cursor-pointer">
+                                    <option value="5 Years" selected>5 Years (Default Standard)</option>
+                                    <option value="3 Years">3 Years</option>
+                                    <option value="7 Years">7 Years</option>
+                                    <option value="10 Years">10 Years</option>
+                                    <option value="custom">Custom Warranty Duration / Text...</option>
+                                </select>
+                                <div id="structuralWarrantyCustomBox" class="hidden">
+                                    <label class="text-[9px] text-orange-300 block mb-0.5">Custom Structural Warranty:</label>
+                                    <input type="text" id="structuralWarrantyCustom" value="5 Years" placeholder="e.g. 6 Years, 8 Years Structural..." class="w-full bg-slate-900 border border-orange-500/50 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none" oninput="if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[9px] text-slate-300 font-semibold block mb-1">Other Materials, Fittings &amp; Appliances Warranty:</label>
+                            <input type="text" id="otherWarrantyNote" value="As per respective Brand / Manufacturer Warranty Policy" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none" oninput="if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                            <p class="text-[9px] text-slate-400 mt-1">Paints, Pipes, Sanitaryware, Electrical Wires/Switches, Tiles &amp; Fixtures follow respective brand warranties.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Signatories (Autofilled as requested: Prepared By = Project Manager, Director = Saroj Pokhrel) -->
@@ -2271,6 +2432,9 @@
 
             <!-- Material Specifications Section -->
             <div id="boqMaterialSpecsSection" class="mt-8 mb-8 avoid-break"></div>
+
+            <!-- Warranty & Guarantee Terms Section (Shown only when ticked) -->
+            <div id="boqWarrantySection" class="hidden mt-6 mb-8 avoid-break"></div>
 
             <!-- Signatures Section -->
             <div class="signature-section grid grid-cols-3 gap-6 avoid-break">
@@ -2977,6 +3141,10 @@
                 customItems: JSON.stringify(window.customItems || []),
                 deselectedBOQItemIds: JSON.stringify(Array.from(window.deselectedBOQItemIds || [])),
                 includeMaterialSpecs: document.getElementById('includeMaterialSpecs')?.checked ?? true,
+                includeWarranty: document.getElementById('includeWarranty')?.checked ?? false,
+                structuralWarrantyDuration: document.getElementById('structuralWarrantyDuration')?.value || '5 Years',
+                structuralWarrantyCustom: document.getElementById('structuralWarrantyCustom')?.value || '5 Years',
+                otherWarrantyNote: document.getElementById('otherWarrantyNote')?.value || 'As per respective Brand / Manufacturer Warranty Policy',
                 materialSpecs: JSON.stringify({
                     cement: document.getElementById('ms_cement')?.value || '',
                     rod: document.getElementById('ms_rod')?.value || '',
@@ -5847,6 +6015,10 @@
                 showAnalyticsInPrint: document.getElementById('showAnalyticsInPrint')?.checked ?? true,
                 showCustomInPrint: document.getElementById('showCustomInPrint')?.checked ?? true,
                 includeMaterialSpecs: document.getElementById('includeMaterialSpecs')?.checked ?? true,
+                includeWarranty: document.getElementById('includeWarranty')?.checked ?? false,
+                structuralWarrantyDuration: document.getElementById('structuralWarrantyDuration')?.value || '5 Years',
+                structuralWarrantyCustom: document.getElementById('structuralWarrantyCustom')?.value || '5 Years',
+                otherWarrantyNote: document.getElementById('otherWarrantyNote')?.value || 'As per respective Brand / Manufacturer Warranty Policy',
                 materialSpecs: JSON.stringify({
                     cement: document.getElementById('ms_cement')?.value || '',
                     rod: document.getElementById('ms_rod')?.value || '',
@@ -6537,6 +6709,23 @@
                 items: prelimItems
             });
 
+            // P. HEAVY DUTY MACHINERY, PLANT & EQUIPMENT DEPLOYMENT
+            const selectedMachinery = window.getSelectedMachineryItems ? window.getSelectedMachineryItems() : [];
+            if (selectedMachinery.length > 0) {
+                categories.push({
+                    id: "cat_p",
+                    name: "P. HEAVY DUTY MACHINERY, PLANT & EQUIPMENT DEPLOYMENT",
+                    items: selectedMachinery.map(m => ({
+                        id: m.id,
+                        desc: `${m.desc} (Deployed on-site for execution efficiency — Qty: ${m.qty} ${m.unit})`,
+                        unit: m.unit,
+                        qty: m.qty,
+                        rate: m.rate,
+                        amount: m.amount
+                    }))
+                });
+            }
+
             // B. EARTHWORK
             categories.push({
                 id: "cat_b",
@@ -7168,8 +7357,9 @@
                 document.getElementById('customItemsBreakdown').classList.add('hidden');
             }
 
-            // Total Grand Investment (Base Construction Area + Custom Items + Special Modular/Wardrobe Joinery)
-            const finalCombinedTotal = totalAreaAmountSum + totalCustomAmount + liveStats.totalInteriorCost;
+            // Total Grand Investment (Base Construction Area + Custom Items + Special Modular/Wardrobe Joinery + Machinery)
+            const machineryTotal = window.getMachineryTotalAmount ? window.getMachineryTotalAmount() : 0;
+            const finalCombinedTotal = totalAreaAmountSum + totalCustomAmount + liveStats.totalInteriorCost + machineryTotal;
             document.getElementById('dispGrandTotal').textContent = formatMoney(finalCombinedTotal);
             const wordsEl = document.getElementById('dispGrandTotalWords');
             if (wordsEl) {
@@ -7493,6 +7683,110 @@
                 } else {
                     boqMaterialSpecsSection.classList.add('hidden');
                     boqMaterialSpecsSection.innerHTML = '';
+                }
+            }
+
+            // Render Warranty & Defect Liability Section (Only when ticked; unchecked by default)
+            const boqWarrantySection = document.getElementById('boqWarrantySection');
+            if (boqWarrantySection) {
+                const includeWarranty = document.getElementById('includeWarranty')?.checked ?? false;
+                if (includeWarranty) {
+                    boqWarrantySection.classList.remove('hidden');
+                    const structuralDuration = window.getStructuralWarrantyText ? window.getStructuralWarrantyText() : '5 Years';
+                    const otherWarrantyNote = document.getElementById('otherWarrantyNote')?.value.trim() || 'As per respective Brand / Manufacturer Warranty Policy';
+                    const companyEntity = selectedBranch === 'dang'
+                        ? (isNp ? 'दाङ कन्स्ट्रक्सन (बुटवल कन्स्ट्रक्सन एण्ड बिल्डर्स प्रा. लि.)' : 'Dang Construction (by Butwal Construction & Builders Pvt. Ltd.)')
+                        : (isNp ? 'बुटवल कन्स्ट्रक्सन एण्ड बिल्डर्स प्रा. लि.' : 'Butwal Construction & Builders Pvt. Ltd.');
+
+                    const npDurationMap = {
+                        '3 Years': '३ वर्ष',
+                        '5 Years': '५ वर्ष',
+                        '7 Years': '७ वर्ष',
+                        '10 Years': '१० वर्ष'
+                    };
+                    const structuralDurationNp = npDurationMap[structuralDuration] || structuralDuration;
+
+                    if (isNp) {
+                        boqWarrantySection.innerHTML = `
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-slate-800 avoid-break">
+                                <div class="border-b-2 border-emerald-600 pb-3 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                    <div>
+                                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                            <i class="fas fa-shield-alt text-emerald-600"></i> वारेन्टी तथा मर्मत दायित्व सम्बन्धी सर्तहरू (WARRANTY TERMS)
+                                        </h3>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">${companyEntity} द्वारा प्रदान गरिने संरचनात्मक तथा ब्रान्ड वारेन्टी विवरण</p>
+                                    </div>
+                                    <span class="self-start sm:self-center text-[10px] bg-emerald-50 text-emerald-800 font-bold px-3 py-1 rounded border border-emerald-200">
+                                        संरचनात्मक वारेन्टी: ${structuralDurationNp}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[10.5px] leading-relaxed">
+                                    <div class="p-4 rounded-lg bg-emerald-50/50 border border-emerald-200">
+                                        <h4 class="font-bold text-emerald-950 text-xs mb-1.5 flex items-center gap-1.5">
+                                            <i class="fas fa-building-shield text-emerald-700"></i> १. संरचनात्मक (Structural) वारेन्टी — ${structuralDurationNp}
+                                        </h4>
+                                        <p class="text-slate-700">
+                                            निर्माण व्यवसायीद्वारा निर्मित मुख्य आरसीसी (RCC) संरचना (जग/फुटिङ, पिलर, पिलिन्थ बिम, छतको बिम, स्ल्याब तथा भर्‍याङ) मा निर्माण कार्यको कमजोरीबाट उत्पन्न हुने गम्भीर संरचनात्मक त्रुटि विरुद्ध घर हस्तान्तरण भएको मितिले <strong>${structuralDurationNp}</strong> सम्म वारेन्टी रहनेछ।
+                                        </p>
+                                        <p class="text-[9.5px] text-slate-500 mt-1.5 italic">
+                                            नोट: भूकम्प, बाढी-पहिरो जस्ता प्राकृतिक प्रकोप, वा हस्तान्तरण पछि ग्राहकद्वारा गरिएका अनधिकृत संरचनात्मक हेरफेर यस वारेन्टी भित्र पर्ने छैनन्।
+                                        </p>
+                                    </div>
+                                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                        <h4 class="font-bold text-slate-900 text-xs mb-1.5 flex items-center gap-1.5">
+                                            <i class="fas fa-certificate text-orange-600"></i> २. अन्य सामग्री तथा फिटिङ्स — ब्रान्ड अनुसार
+                                        </h4>
+                                        <p class="text-slate-700">
+                                            भवनमा प्रयोग हुने रङरोगन, वाटरप्रूफिङ केमिकल, खानेपानी पाइप तथा ट्याङ्की, सेनेटरी सामान, विद्युतीय तार तथा स्विच, टायल, ढोका/झ्याल तथा अन्य उपकरणहरूको वारेन्टी <strong>सम्बन्धित ब्रान्ड / उत्पादक कम्पनीले तोके अनुसार</strong> रहनेछ।
+                                        </p>
+                                        <p class="text-[9.5px] text-slate-500 mt-1.5">
+                                            <span class="font-semibold text-slate-700">नीति विवरण:</span> ${otherWarrantyNote}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        boqWarrantySection.innerHTML = `
+                            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-slate-800 avoid-break">
+                                <div class="border-b-2 border-emerald-600 pb-3 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                    <div>
+                                        <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                            <i class="fas fa-shield-alt text-emerald-600"></i> WARRANTY &amp; DEFECT LIABILITY TERMS
+                                        </h3>
+                                        <p class="text-[10px] text-slate-500 mt-0.5">Structural execution guarantee and manufacturer brand warranty coverage by ${companyEntity}</p>
+                                    </div>
+                                    <span class="self-start sm:self-center text-[10px] bg-emerald-50 text-emerald-800 font-bold px-3 py-1 rounded border border-emerald-200 uppercase tracking-wider">
+                                        Structural: ${structuralDuration}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-[10.5px] leading-relaxed">
+                                    <div class="p-4 rounded-lg bg-emerald-50/50 border border-emerald-200">
+                                        <h4 class="font-bold text-emerald-950 text-xs mb-1.5 flex items-center gap-1.5">
+                                            <i class="fas fa-building text-emerald-700"></i> 1. Structural Work Warranty — ${structuralDuration}
+                                        </h4>
+                                        <p class="text-slate-700">
+                                            The Contractor provides a <strong>${structuralDuration}</strong> structural warranty from the date of project handover covering primary load-bearing RCC elements constructed under this contract (Foundations/Footings, Columns, Plinth Beams, Floor Beams, Slabs, and Staircases) against structural failure or major workmanship defects.
+                                        </p>
+                                        <p class="text-[9.5px] text-slate-500 mt-1.5 italic">
+                                            Exclusions: Force majeure / natural calamities (earthquakes exceeding code limits, floods, landslides), unauthorized structural modifications, or third-party damage after handover.
+                                        </p>
+                                    </div>
+                                    <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
+                                        <h4 class="font-bold text-slate-900 text-xs mb-1.5 flex items-center gap-1.5">
+                                            <i class="fas fa-certificate text-orange-600"></i> 2. Materials, Fittings &amp; Appliances — Brand Warranty
+                                        </h4>
+                                        <p class="text-slate-700">
+                                            All finishing materials, paints, waterproofing chemicals, plumbing pipes &amp; overhead tanks, sanitary bathware, electrical wires, switches, tiles, doors/windows, and fixtures are covered strictly <strong>${otherWarrantyNote}</strong>. Original manufacturer warranty cards and supplier details shall be handed over upon completion.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    boqWarrantySection.classList.add('hidden');
+                    boqWarrantySection.innerHTML = '';
                 }
             }
 
@@ -8152,6 +8446,22 @@
                     }
                 }
 
+                // Restore Warranty Settings (Unchecked by default)
+                if (document.getElementById('includeWarranty')) {
+                    document.getElementById('includeWarranty').checked = !!item.includeWarranty;
+                }
+                if (item.structuralWarrantyDuration !== undefined && document.getElementById('structuralWarrantyDuration')) {
+                    document.getElementById('structuralWarrantyDuration').value = item.structuralWarrantyDuration;
+                }
+                if (item.structuralWarrantyCustom !== undefined && document.getElementById('structuralWarrantyCustom')) {
+                    document.getElementById('structuralWarrantyCustom').value = item.structuralWarrantyCustom;
+                }
+                if (item.otherWarrantyNote !== undefined && document.getElementById('otherWarrantyNote')) {
+                    document.getElementById('otherWarrantyNote').value = item.otherWarrantyNote;
+                }
+                if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
+                if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
+
                 // BOQ Item selections
                 if (item.deselectedBOQItemIds) {
                     try {
@@ -8354,6 +8664,14 @@
                     if (document.getElementById('ms_switches')) document.getElementById('ms_switches').value = "MG / Kelino Premium Switches";
                     if (document.getElementById('ms_switches_type')) document.getElementById('ms_switches_type').value = "Modular";
                     if (document.getElementById('ms_tiles')) document.getElementById('ms_tiles').value = "Cresta / Laminar Premium Double-Charged Vitrified Tiles";
+
+                    // Reset Warranty Settings (Unchecked by default)
+                    if (document.getElementById('includeWarranty')) document.getElementById('includeWarranty').checked = false;
+                    if (document.getElementById('structuralWarrantyDuration')) document.getElementById('structuralWarrantyDuration').value = "5 Years";
+                    if (document.getElementById('structuralWarrantyCustom')) document.getElementById('structuralWarrantyCustom').value = "5 Years";
+                    if (document.getElementById('otherWarrantyNote')) document.getElementById('otherWarrantyNote').value = "As per respective Brand / Manufacturer Warranty Policy";
+                    if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
+                    if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
                     
                     // Reset Out of BOQ fields
                     if (document.getElementById('outOfBoqScope')) document.getElementById('outOfBoqScope').value = "finishing_only";
@@ -8475,6 +8793,14 @@
                     if (document.getElementById('ms_switches_type')) document.getElementById('ms_switches_type').value = "Modular";
                     if (document.getElementById('ms_tiles')) document.getElementById('ms_tiles').value = "Cresta / Laminar Premium Double-Charged Vitrified Tiles";
 
+                    // Reset Warranty Settings (Unchecked by default)
+                    if (document.getElementById('includeWarranty')) document.getElementById('includeWarranty').checked = false;
+                    if (document.getElementById('structuralWarrantyDuration')) document.getElementById('structuralWarrantyDuration').value = "5 Years";
+                    if (document.getElementById('structuralWarrantyCustom')) document.getElementById('structuralWarrantyCustom').value = "5 Years";
+                    if (document.getElementById('otherWarrantyNote')) document.getElementById('otherWarrantyNote').value = "As per respective Brand / Manufacturer Warranty Policy";
+                    if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
+                    if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
+
                     window.customItems = [];
                     renderCustomItems();
                     buildFloorStructure("1");
@@ -8526,27 +8852,107 @@
             }
         };
 
+        window.toggleMachineryInputs = function(type) {
+            const chk = document.getElementById(`mach_${type}_enabled`);
+            const box = document.getElementById(`mach_${type}_box`);
+            if (chk && box) {
+                if (chk.checked) box.classList.remove('hidden');
+                else box.classList.add('hidden');
+            }
+        };
+
+        window.getSelectedMachineryItems = function() {
+            const items = [];
+            const types = ['rmc', 'jcb', 'pump', 'crane', 'roller', 'dg'];
+            const names = {
+                rmc: 'READY MIX CONCRETE (RMC) SUPPLY & PUMPING',
+                jcb: 'HYDRAULIC EXCAVATOR / JCB RENTAL & DEPLOYMENT',
+                pump: 'MOBILE CONCRETE PUMP / BOOM PLACER DEPLOYMENT',
+                crane: 'TOWER CRANE / MATERIAL HOIST LIFT RENTAL',
+                roller: 'VIBRATORY SOIL COMPACTOR / ROLLER DEPLOYMENT',
+                dg: 'DIESEL GENERATOR SET (POWER BACKUP) RENTAL'
+            };
+            const units = { rmc: 'Cum', jcb: 'Hours', pump: 'Job', crane: 'Months', roller: 'Days', dg: 'Months' };
+
+            types.forEach(t => {
+                const chk = document.getElementById(`mach_${t}_enabled`);
+                if (chk && chk.checked) {
+                    const qty = parseFloat(document.getElementById(`mach_${t}_qty`)?.value) || 1;
+                    const rate = parseFloat(document.getElementById(`mach_${t}_rate`)?.value) || 0;
+                    items.push({
+                        id: 'mach_' + t,
+                        desc: names[t],
+                        unit: units[t],
+                        qty,
+                        rate,
+                        amount: qty * rate
+                    });
+                }
+            });
+            return items;
+        };
+
+        window.getMachineryTotalAmount = function() {
+            const items = window.getSelectedMachineryItems();
+            return items.reduce((sum, i) => sum + i.amount, 0);
+        };
+
         window.updateFootingSizeLabel = function() {
             const isMat = document.getElementById('includeFootingMat')?.checked;
             const labelEl = document.getElementById('footingSizeLabelText');
             const lLbl = document.getElementById('lblFootingL');
             const wLbl = document.getElementById('lblFootingW');
             const dLbl = document.getElementById('lblFootingD');
+            const hintEl = document.getElementById('raftMatHint');
             if (labelEl) {
                 if (isMat) {
                     labelEl.innerHTML = '<i class="fas fa-layer-group mr-1 text-orange-400"></i> Raft Mat Footprint (Total Building L × W & Slab Thickness D)';
                     if (lLbl) lLbl.textContent = 'Building L (ft)';
                     if (wLbl) wLbl.textContent = 'Building W (ft)';
                     if (dLbl) dLbl.textContent = 'Mat Thk (ft)';
+                    if (hintEl) hintEl.classList.remove('hidden');
                 } else {
                     labelEl.innerHTML = '<i class="fas fa-shoe-prints mr-1 text-orange-400"></i> Footing Size (Per Column L × W × D)';
                     if (lLbl) lLbl.textContent = 'L (ft)';
                     if (wLbl) lLbl.textContent = 'W (ft)';
                     if (dLbl) dLbl.textContent = 'D (ft)';
+                    if (hintEl) hintEl.classList.add('hidden');
                 }
             }
         };
         window.updateFootingSizeLabel();
+
+        window.toggleWarrantyOptions = function() {
+            const chk = document.getElementById('includeWarranty');
+            const box = document.getElementById('warrantyOptionsBox');
+            if (chk && box) {
+                if (chk.checked) box.classList.remove('hidden');
+                else box.classList.add('hidden');
+            }
+        };
+
+        window.onStructuralWarrantyChange = function(skipRegenerate = false) {
+            const sel = document.getElementById('structuralWarrantyDuration');
+            const customBox = document.getElementById('structuralWarrantyCustomBox');
+            if (sel && customBox) {
+                if (sel.value === 'custom') customBox.classList.remove('hidden');
+                else customBox.classList.add('hidden');
+            }
+            if (!skipRegenerate && window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) {
+                window.generateBOQ();
+            }
+        };
+
+        window.getStructuralWarrantyText = function() {
+            const selVal = document.getElementById('structuralWarrantyDuration')?.value || '5 Years';
+            if (selVal === 'custom') {
+                return document.getElementById('structuralWarrantyCustom')?.value.trim() || '5 Years';
+            }
+            return selVal;
+        };
+
+        window.toggleWarrantyOptions();
+        window.onStructuralWarrantyChange(true);
 
         // Restore any existing autosave cache immediately so user never loses state
         try {
