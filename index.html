@@ -876,26 +876,40 @@
                             </div>
                         </div>
 
-                        <!-- Quotation Validity & Estimated Project Timeline -->
-                        <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-800/80">
+                        <!-- Quotation Date, Validity & Estimated Project Timeline -->
+                        <div class="pt-1.5 border-t border-slate-800/80 space-y-2">
                             <div>
-                                <label class="text-[9px] text-slate-300 font-semibold block mb-0.5">
-                                    <i class="fas fa-hourglass-half text-orange-400 mr-1"></i>Quote Validity
-                                </label>
-                                <select id="quoteValiditySelect" onchange="window.onQuoteValidityChange()" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-orange-300 font-semibold outline-none cursor-pointer">
-                                    <option value="15 Days" selected>15 Days (Standard)</option>
-                                    <option value="30 Days">30 Days</option>
-                                    <option value="45 Days">45 Days</option>
-                                    <option value="7 Days">7 Days</option>
-                                    <option value="custom">Custom Validity...</option>
-                                </select>
-                                <input type="text" id="quoteValidityCustom" value="15 Days" placeholder="e.g. 20 Days" class="hidden mt-1 w-full bg-slate-900 border border-orange-500/50 rounded-lg px-2 py-1 text-xs text-white outline-none" oninput="if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <label class="text-[9px] text-slate-300 font-semibold">
+                                        <i class="fas fa-calendar-day text-orange-400 mr-1"></i>Quotation Date
+                                    </label>
+                                    <button type="button" onclick="window.resetQuoteDateToToday()" class="text-[9px] text-orange-400 hover:text-orange-300 font-bold cursor-pointer" title="Reset to Today's Date">
+                                        Today
+                                    </button>
+                                </div>
+                                <input type="date" id="quoteDate" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white input-glow outline-none font-medium [color-scheme:dark]" onchange="window.onQuoteDateChange()">
                             </div>
-                            <div>
-                                <label class="text-[9px] text-slate-300 font-semibold block mb-0.5">
-                                    <i class="fas fa-calendar-alt text-orange-400 mr-1"></i>Est. Completion Time
-                                </label>
-                                <input type="text" id="projectTimeline" value="6–8 Months" placeholder="e.g. 10–14 Months" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white input-glow outline-none font-medium" oninput="window.isTimelineManuallyEdited = true; if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[9px] text-slate-300 font-semibold block mb-0.5">
+                                        <i class="fas fa-hourglass-half text-orange-400 mr-1"></i>Quote Validity
+                                    </label>
+                                    <select id="quoteValiditySelect" onchange="window.onQuoteValidityChange()" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-orange-300 font-semibold outline-none cursor-pointer">
+                                        <option value="15 Days" selected>15 Days (Standard)</option>
+                                        <option value="30 Days">30 Days</option>
+                                        <option value="45 Days">45 Days</option>
+                                        <option value="7 Days">7 Days</option>
+                                        <option value="custom">Custom Validity...</option>
+                                    </select>
+                                    <input type="text" id="quoteValidityCustom" value="15 Days" placeholder="e.g. 20 Days" class="hidden mt-1 w-full bg-slate-900 border border-orange-500/50 rounded-lg px-2 py-1 text-xs text-white outline-none" oninput="if(window.updateSidebarValidUntilHint) window.updateSidebarValidUntilHint(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                    <div id="sidebarValidUntilHint" class="text-[9px] text-slate-400 mt-0.5 font-medium"></div>
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-300 font-semibold block mb-0.5">
+                                        <i class="fas fa-calendar-alt text-orange-400 mr-1"></i>Est. Completion Time
+                                    </label>
+                                    <input type="text" id="projectTimeline" value="6–8 Months" placeholder="e.g. 10–14 Months" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white input-glow outline-none font-medium" oninput="window.isTimelineManuallyEdited = true; if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2051,10 +2065,15 @@
                                 <span id="coverLocPrefix" class="font-normal text-slate-600">Location:</span> 
                                 <strong class="font-bold text-[#0b1a30] text-base sm:text-lg" id="coverProjectLoc">Kalikanagar</strong>
                             </div>
-                            <div class="pt-1.5 mt-1.5 border-t border-slate-200 grid grid-cols-2 gap-3 text-xs sm:text-sm font-sans">
+                            <div class="pt-1.5 mt-1.5 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm font-sans">
+                                <div>
+                                    <span id="coverDatePrefix" class="text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Date:</span>
+                                    <strong class="font-bold text-[#0b1a30]" id="coverQuoteDate">-</strong>
+                                </div>
                                 <div>
                                     <span id="coverValidityPrefix" class="text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Quote Validity:</span>
                                     <strong class="font-bold text-[#0b1a30]" id="coverQuoteValidity">15 Days</strong>
+                                    <span id="coverValidUntil" class="block text-[10px] text-slate-500 font-medium"></span>
                                 </div>
                                 <div>
                                     <span id="coverTimelinePrefix" class="text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Est. Timeline:</span>
@@ -2163,14 +2182,18 @@
                     </div>
                 </div>
 
-                <!-- Quotation Validity & Project Timeline Header Strip -->
-                <div class="grid grid-cols-2 gap-3 text-[11px] bg-white px-3 py-2 rounded-lg border border-slate-200">
-                    <div class="flex items-center justify-between">
-                        <span id="lblHeaderValidity" class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-hourglass-half text-orange-500 mr-1"></i>Quotation Validity</span>
-                        <span id="dispQuoteValidity" class="font-bold text-slate-800">15 Days</span>
+                <!-- Quotation Date, Validity & Project Timeline Header Strip -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[11px] bg-white px-3 py-2 rounded-lg border border-slate-200">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-calendar-day text-orange-500 mr-1"></i><span id="lblHeaderDate">Quotation Date</span></span>
+                        <span id="dispQuoteDate" class="font-bold text-slate-800">-</span>
                     </div>
-                    <div class="flex items-center justify-between border-l border-slate-200 pl-3">
-                        <span id="lblHeaderTimeline" class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-calendar-check text-orange-500 mr-1"></i>Est. Completion Time</span>
+                    <div class="flex items-center justify-between gap-2 sm:border-l border-slate-200 sm:pl-3">
+                        <span class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-hourglass-half text-orange-500 mr-1"></i><span id="lblHeaderValidity">Quotation Validity</span></span>
+                        <span id="dispQuoteValidity" class="font-bold text-slate-800 text-right">15 Days</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 sm:border-l border-slate-200 sm:pl-3">
+                        <span class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-calendar-check text-orange-500 mr-1"></i><span id="lblHeaderTimeline">Est. Completion Time</span></span>
                         <span id="dispProjectTimeline" class="font-bold text-orange-700">6–8 Months</span>
                     </div>
                 </div>
@@ -2569,7 +2592,7 @@
                     <div class="signature-line"></div>
                     <p class="font-bold text-slate-800 mt-1.5 text-xs" id="dispPreparedBy">Project Manager</p>
                     <p class="text-[10px] text-slate-500" id="dispPreparedRole">Prepared By</p>
-                    <p class="text-[9px] text-slate-400 mt-0.5">Date: <span id="currentDate"></span></p>
+                    <p class="text-[9px] text-slate-400 mt-0.5"><span id="lblSigPreparedDate">Date:</span> <span id="currentDate"></span></p>
                 </div>
                 <div class="text-center">
                     <div class="signature-line"></div>
@@ -3259,6 +3282,7 @@
                 boqLanguage: window.boqLanguage || 'en',
                 includeInteriorPutty: document.getElementById('includeInteriorPutty')?.checked ?? true,
                 mainDoorType: document.getElementById('mainDoorType')?.value || 'sal',
+                quoteDate: document.getElementById('quoteDate')?.value || '',
                 quoteValiditySelect: document.getElementById('quoteValiditySelect')?.value || '15 Days',
                 quoteValidityCustom: document.getElementById('quoteValidityCustom')?.value || '15 Days',
                 projectTimeline: document.getElementById('projectTimeline')?.value || '6–8 Months',
@@ -3762,10 +3786,56 @@
         window.formatMoney = (n) => 'Rs. ' + new Intl.NumberFormat('en-NP', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
         window.formatQty = (n) => new Intl.NumberFormat('en-NP', { maximumFractionDigits: 2 }).format(n || 0);
 
-        // Date init
-        function setDate() {
+        // Date helpers & init (auto-defaults to today's local date, user-editable)
+        window.getTodayIsoDate = function() {
             const now = new Date();
-            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-NP', { year: 'numeric', month: 'long', day: 'numeric' });
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        };
+
+        window.parseLocalIsoDate = function(isoStr) {
+            if (isoStr && /^\d{4}-\d{2}-\d{2}$/.test(isoStr)) {
+                const [y, m, d] = isoStr.split('-').map(Number);
+                return new Date(y, m - 1, d);
+            }
+            return new Date();
+        };
+
+        window.formatDisplayDate = function(dateObj, shortMonth = false) {
+            return dateObj.toLocaleDateString('en-NP', {
+                year: 'numeric',
+                month: shortMonth ? 'short' : 'long',
+                day: 'numeric'
+            });
+        };
+
+        window.getValidityDaysFromText = function(valText) {
+            const str = String(valText || '').trim();
+            let m = str.match(/(\d+)\s*(?:days?|दिन)/i);
+            if (!m) m = str.match(/^(\d+)$/);
+            if (!m) return null;
+            const n = parseInt(m[1], 10);
+            return isNaN(n) ? null : n;
+        };
+
+        window.getQuoteValidUntilDate = function(isoDateStr, validityText) {
+            const days = window.getValidityDaysFromText(validityText);
+            if (days === null || days < 0) return null;
+            const dt = window.parseLocalIsoDate(isoDateStr);
+            dt.setDate(dt.getDate() + days);
+            return dt;
+        };
+
+        function setDate() {
+            const dateInput = document.getElementById('quoteDate');
+            if (dateInput && !dateInput.value) {
+                dateInput.value = window.getTodayIsoDate();
+            }
+            const dt = window.parseLocalIsoDate(dateInput?.value);
+            const curEl = document.getElementById('currentDate');
+            if (curEl) curEl.textContent = window.formatDisplayDate(dt, false);
         }
         setDate();
 
@@ -6156,6 +6226,7 @@
                 structuralWarrantyDuration: document.getElementById('structuralWarrantyDuration')?.value || '5 Years',
                 structuralWarrantyCustom: document.getElementById('structuralWarrantyCustom')?.value || '5 Years',
                 otherWarrantyNote: document.getElementById('otherWarrantyNote')?.value || 'As per respective Brand / Manufacturer Warranty Policy',
+                quoteDate: document.getElementById('quoteDate')?.value || '',
                 quoteValiditySelect: document.getElementById('quoteValiditySelect')?.value || '15 Days',
                 quoteValidityCustom: document.getElementById('quoteValidityCustom')?.value || '15 Days',
                 projectTimeline: document.getElementById('projectTimeline')?.value || '6–8 Months',
@@ -6281,18 +6352,46 @@
             const coverLoc = document.getElementById('coverProjectLoc');
             if (coverLoc) coverLoc.textContent = projectLoc;
 
+            const quoteDateInput = document.getElementById('quoteDate');
+            const activeIsoDate = (quoteDateInput && quoteDateInput.value) ? quoteDateInput.value : (window.getTodayIsoDate ? window.getTodayIsoDate() : '');
+            if (quoteDateInput && !quoteDateInput.value && activeIsoDate) quoteDateInput.value = activeIsoDate;
+            const quoteDateObj = window.parseLocalIsoDate ? window.parseLocalIsoDate(activeIsoDate) : new Date();
+            const dispLongDate = window.formatDisplayDate ? window.formatDisplayDate(quoteDateObj, false) : quoteDateObj.toLocaleDateString('en-NP', { year: 'numeric', month: 'long', day: 'numeric' });
+            const dispShortDate = window.formatDisplayDate ? window.formatDisplayDate(quoteDateObj, true) : dispLongDate;
+
+            const curSigDateEl = document.getElementById('currentDate');
+            if (curSigDateEl) curSigDateEl.textContent = dispLongDate;
+
             const rawValidity = window.getQuoteValidityText ? window.getQuoteValidityText() : '15 Days';
             const rawTimeline = document.getElementById('projectTimeline')?.value.trim() || '6–8 Months';
             const npValidityMap = { '7 Days': '७ दिन', '15 Days': '१५ दिन', '30 Days': '३० दिन', '45 Days': '४५ दिन' };
             const dispValidity = isNp ? (npValidityMap[rawValidity] || rawValidity) : rawValidity;
             const dispTimeline = isNp ? rawTimeline.replace(/Months?/gi, 'महिना').replace(/Days?/gi, 'दिन') : rawTimeline;
 
+            const validUntilObj = window.getQuoteValidUntilDate ? window.getQuoteValidUntilDate(activeIsoDate, rawValidity) : null;
+            const validUntilShort = validUntilObj && window.formatDisplayDate ? window.formatDisplayDate(validUntilObj, true) : '';
+
+            const coverDateEl = document.getElementById('coverQuoteDate');
+            if (coverDateEl) coverDateEl.textContent = dispShortDate;
             const coverValEl = document.getElementById('coverQuoteValidity');
             if (coverValEl) coverValEl.textContent = dispValidity;
+            const coverValidUntilEl = document.getElementById('coverValidUntil');
+            if (coverValidUntilEl) {
+                coverValidUntilEl.textContent = validUntilShort
+                    ? (isNp ? `(${validUntilShort} सम्म मान्य)` : `(Until ${validUntilShort})`)
+                    : '';
+            }
             const coverTimeEl = document.getElementById('coverProjectTimeline');
             if (coverTimeEl) coverTimeEl.textContent = dispTimeline;
+
+            const hdrDateEl = document.getElementById('dispQuoteDate');
+            if (hdrDateEl) hdrDateEl.textContent = dispShortDate;
             const hdrValEl = document.getElementById('dispQuoteValidity');
-            if (hdrValEl) hdrValEl.textContent = dispValidity;
+            if (hdrValEl) {
+                hdrValEl.textContent = validUntilShort
+                    ? (isNp ? `${dispValidity} (${validUntilShort} सम्म)` : `${dispValidity} (Until ${validUntilShort})`)
+                    : dispValidity;
+            }
             const hdrTimeEl = document.getElementById('dispProjectTimeline');
             if (hdrTimeEl) hdrTimeEl.textContent = dispTimeline;
             if (isExistingGf) {
@@ -8702,7 +8801,13 @@
                 if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
                 if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
 
-                // Restore Validity, Timeline & Payment Schedule
+                // Restore Date, Validity, Timeline & Payment Schedule
+                if (document.getElementById('quoteDate')) {
+                    document.getElementById('quoteDate').value = (item.quoteDate && /^\d{4}-\d{2}-\d{2}$/.test(item.quoteDate))
+                        ? item.quoteDate
+                        : (window.getTodayIsoDate ? window.getTodayIsoDate() : '');
+                }
+                if (typeof setDate === 'function') setDate();
                 if (item.quoteValiditySelect !== undefined && document.getElementById('quoteValiditySelect')) {
                     document.getElementById('quoteValiditySelect').value = item.quoteValiditySelect;
                 }
@@ -8710,6 +8815,7 @@
                     document.getElementById('quoteValidityCustom').value = item.quoteValidityCustom;
                 }
                 if (typeof window.onQuoteValidityChange === 'function') window.onQuoteValidityChange(true);
+                if (typeof window.updateSidebarValidUntilHint === 'function') window.updateSidebarValidUntilHint();
                 if (item.projectTimeline !== undefined && document.getElementById('projectTimeline')) {
                     document.getElementById('projectTimeline').value = item.projectTimeline;
                     window.isTimelineManuallyEdited = true;
@@ -8941,11 +9047,16 @@
                     if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
                     if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
 
-                    // Reset Validity, Timeline & Payment Schedule
+                    // Reset Date, Validity, Timeline & Payment Schedule
                     window.isTimelineManuallyEdited = false;
+                    if (document.getElementById('quoteDate') && window.getTodayIsoDate) {
+                        document.getElementById('quoteDate').value = window.getTodayIsoDate();
+                    }
+                    if (typeof setDate === 'function') setDate();
                     if (document.getElementById('quoteValiditySelect')) document.getElementById('quoteValiditySelect').value = "15 Days";
                     if (document.getElementById('quoteValidityCustom')) document.getElementById('quoteValidityCustom').value = "15 Days";
                     if (typeof window.onQuoteValidityChange === 'function') window.onQuoteValidityChange(true);
+                    if (typeof window.updateSidebarValidUntilHint === 'function') window.updateSidebarValidUntilHint();
                     if (document.getElementById('projectTimeline')) document.getElementById('projectTimeline').value = "6–8 Months";
                     if (document.getElementById('includePaymentSchedule')) document.getElementById('includePaymentSchedule').checked = false;
                     if (typeof window.resetPaymentScheduleDefaults === 'function') window.resetPaymentScheduleDefaults(true);
@@ -9079,11 +9190,16 @@
                     if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
                     if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
 
-                    // Reset Validity, Timeline & Payment Schedule
+                    // Reset Date, Validity, Timeline & Payment Schedule
                     window.isTimelineManuallyEdited = false;
+                    if (document.getElementById('quoteDate') && window.getTodayIsoDate) {
+                        document.getElementById('quoteDate').value = window.getTodayIsoDate();
+                    }
+                    if (typeof setDate === 'function') setDate();
                     if (document.getElementById('quoteValiditySelect')) document.getElementById('quoteValiditySelect').value = "15 Days";
                     if (document.getElementById('quoteValidityCustom')) document.getElementById('quoteValidityCustom').value = "15 Days";
                     if (typeof window.onQuoteValidityChange === 'function') window.onQuoteValidityChange(true);
+                    if (typeof window.updateSidebarValidUntilHint === 'function') window.updateSidebarValidUntilHint();
                     if (document.getElementById('projectTimeline')) document.getElementById('projectTimeline').value = "6–8 Months";
                     if (document.getElementById('includePaymentSchedule')) document.getElementById('includePaymentSchedule').checked = false;
                     if (typeof window.resetPaymentScheduleDefaults === 'function') window.resetPaymentScheduleDefaults(true);
@@ -9303,6 +9419,36 @@
             return '14–18 Months';
         };
 
+        window.onQuoteDateChange = function(skipRegenerate = false) {
+            if (typeof setDate === 'function') setDate();
+            if (window.updateSidebarValidUntilHint) window.updateSidebarValidUntilHint();
+            if (!skipRegenerate && window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) {
+                window.generateBOQ();
+            }
+        };
+
+        window.resetQuoteDateToToday = function() {
+            const el = document.getElementById('quoteDate');
+            if (el && window.getTodayIsoDate) {
+                el.value = window.getTodayIsoDate();
+            }
+            window.onQuoteDateChange();
+            if (window.autoSaveToCloudBackground) window.autoSaveToCloudBackground();
+        };
+
+        window.updateSidebarValidUntilHint = function() {
+            const hint = document.getElementById('sidebarValidUntilHint');
+            if (!hint) return;
+            const dateStr = document.getElementById('quoteDate')?.value || (window.getTodayIsoDate ? window.getTodayIsoDate() : '');
+            const valText = window.getQuoteValidityText ? window.getQuoteValidityText() : '15 Days';
+            const validUntil = window.getQuoteValidUntilDate ? window.getQuoteValidUntilDate(dateStr, valText) : null;
+            if (validUntil && window.formatDisplayDate) {
+                hint.textContent = `Valid until: ${window.formatDisplayDate(validUntil, true)}`;
+            } else {
+                hint.textContent = '';
+            }
+        };
+
         window.onQuoteValidityChange = function(skipRegenerate = false) {
             const sel = document.getElementById('quoteValiditySelect');
             const customInp = document.getElementById('quoteValidityCustom');
@@ -9310,6 +9456,7 @@
                 if (sel.value === 'custom') customInp.classList.remove('hidden');
                 else customInp.classList.add('hidden');
             }
+            if (window.updateSidebarValidUntilHint) window.updateSidebarValidUntilHint();
             if (!skipRegenerate && window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) {
                 window.generateBOQ();
             }
@@ -9363,6 +9510,7 @@
         };
 
         window.onQuoteValidityChange(true);
+        window.updateSidebarValidUntilHint();
         window.togglePaymentScheduleOptions();
         window.updatePaymentScheduleSum(true);
 
