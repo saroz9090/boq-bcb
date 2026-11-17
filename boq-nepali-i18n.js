@@ -250,6 +250,14 @@ root.applyBoqLanguageDOM = function(isNp) {
     if (coverClientPrefix) coverClientPrefix.textContent = isNp ? "सेवाग्राही / ग्राहक:" : "Client:";
     const coverLocPrefix = document.getElementById('coverLocPrefix');
     if (coverLocPrefix) coverLocPrefix.textContent = isNp ? "आयोजना स्थल / ठेगाना:" : "Location:";
+    const coverValidityPrefix = document.getElementById('coverValidityPrefix');
+    if (coverValidityPrefix) coverValidityPrefix.textContent = isNp ? "दरभाउ मान्य अवधि:" : "Quote Validity:";
+    const coverTimelinePrefix = document.getElementById('coverTimelinePrefix');
+    if (coverTimelinePrefix) coverTimelinePrefix.textContent = isNp ? "अनुमानित अवधि:" : "Est. Timeline:";
+    const lblHeaderValidity = document.getElementById('lblHeaderValidity');
+    if (lblHeaderValidity) lblHeaderValidity.textContent = isNp ? "दरभाउ मान्य अवधि" : "Quotation Validity";
+    const lblHeaderTimeline = document.getElementById('lblHeaderTimeline');
+    if (lblHeaderTimeline) lblHeaderTimeline.textContent = isNp ? "अनुमानित निर्माण अवधि" : "Est. Completion Time";
     const coverDistributor = document.getElementById('coverDistributorLabel');
     if (coverDistributor) coverDistributor.textContent = isNp ? "आधिकारिक बिक्रेता:" : "OFFICIAL DISTRIBUTOR:";
     const coverSince = document.getElementById('coverSinceLabel');
@@ -292,8 +300,10 @@ root.applyBoqLanguageDOM = function(isNp) {
     // Signatures
     const sigPrepRole = document.getElementById('dispPreparedRole');
     if (sigPrepRole) sigPrepRole.textContent = isNp ? "इस्टिमेट तयार गर्ने" : "Prepared By";
-    const sigSupRole = document.getElementById('dispSupervisingRole');
-    if (sigSupRole) sigSupRole.textContent = isNp ? "जाँच गर्ने (साइट इन्जिनियर)" : "Supervising Engineer";
+    const sigClientRole = document.getElementById('dispClientSigRole');
+    if (sigClientRole) sigClientRole.textContent = isNp ? "ग्राहक / घरधनी स्वीकृति हस्ताक्षर" : "Client Acceptance & Approval";
+    const sigClientSub = document.getElementById('dispClientSigSub');
+    if (sigClientSub) sigClientSub.textContent = isNp ? "हस्ताक्षर तथा मिति" : "Signature & Date";
     const sigAppRole = document.getElementById('dispApprovedRole');
     if (sigAppRole) sigAppRole.textContent = isNp ? "स्वीकृत गर्ने (प्रबन्ध निर्देशक)" : "Director / Approved By";
 };

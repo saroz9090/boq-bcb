@@ -300,21 +300,21 @@
             <h2 class="text-base font-bold text-white mb-0.5 text-center">Sign In</h2>
             <p class="text-slate-400 mb-4 text-xs text-center">Authorized Engineer / Admin Access</p>
             
-            <form id="loginForm" class="space-y-3.5">
+            <form id="loginForm" autocomplete="off" class="space-y-3.5">
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">User ID / Username</label>
-                    <input type="text" id="username" value="butwal" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white font-medium" placeholder="Enter username or ID" required>
+                    <input type="text" id="username" value="" autocomplete="off" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white font-medium" placeholder="Enter username or ID" required>
                 </div>
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-300 mb-1">Password</label>
-                    <input type="password" id="password" value="construction123" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white" placeholder="Enter password" required>
+                    <input type="password" id="password" value="" autocomplete="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs input-glow outline-none text-white" placeholder="Enter password" required>
                 </div>
                 <button type="submit" id="loginSubmitBtn" class="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-bold py-2.5 rounded-lg shadow-lg smooth-transition text-xs tracking-wide flex items-center justify-center gap-1.5">
                     <i class="fas fa-lock"></i> <span>Access BOQ System</span>
                 </button>
             </form>
             <div class="mt-3.5 pt-2.5 border-t border-slate-800 text-[10px] text-slate-400 text-center flex justify-between items-center">
-                <span>Default: <strong class="text-slate-300">butwal / construction123</strong></span>
+                <span><i class="fas fa-shield-alt text-slate-500 mr-1"></i>Authorized Staff Only</span>
                 <span class="text-emerald-400 flex items-center gap-1"><i class="fas fa-circle text-[6px]"></i> Cloud Synced</span>
             </div>
         </div>
@@ -483,9 +483,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <button type="button" onclick="window.toggleSidebarFullscreen()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold px-2 py-1.5 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1" title="Toggle Fullscreen Sidebar (Focus Mode)">
-                        <i id="sidebarExpandIcon" class="fas fa-expand text-orange-400 text-xs"></i> <span id="sidebarExpandText" class="hidden sm:inline">Focus</span>
-                    </button>
                     <button type="button" onclick="triggerCreateNewBoq()" class="bg-emerald-600/25 hover:bg-emerald-600 text-emerald-300 hover:text-white text-[11px] font-semibold px-2 py-1.5 rounded-lg border border-emerald-500/40 smooth-transition flex items-center gap-1" title="Start a fresh, new BOQ project">
                         <i class="fas fa-plus text-xs"></i> New BOQ
                     </button>
@@ -500,9 +497,25 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Focus Layout Controls (Half / Full / Esc) & Quick Generate/Preview -->
+            <div class="mt-2.5 flex items-center justify-between gap-1.5">
+                <div class="flex items-center gap-1.5">
+                    <button type="button" id="sidebarHalfBtn" onclick="window.toggleSidebarHalfScreen()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1 cursor-pointer" title="Expand sidebar to Half Screen (50%) — Press Esc to exit">
+                        <i id="sidebarHalfIcon" class="fas fa-columns text-orange-400 text-[10px]"></i> <span id="sidebarHalfText">Half Screen</span>
+                    </button>
+                    <button type="button" id="sidebarFullBtn" onclick="window.toggleSidebarFullscreen()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1 cursor-pointer" title="Expand sidebar to Full Screen Focus Mode — Press Esc to exit">
+                        <i id="sidebarExpandIcon" class="fas fa-expand text-orange-400 text-[10px]"></i> <span id="sidebarExpandText">Full Screen</span>
+                    </button>
+                    <span id="sidebarEscHint" class="hidden text-[9px] text-amber-300 bg-amber-950/60 border border-amber-500/40 px-1.5 py-0.5 rounded font-mono">Esc to exit</span>
+                </div>
+                <button type="button" id="headerQuickPreviewBtn" onclick="window.quickGenerateAndPreview()" class="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white text-[10.5px] font-bold px-2.5 py-1 rounded-lg shadow-md smooth-transition flex items-center gap-1 cursor-pointer" title="Generate BOQ and jump directly to preview">
+                    <i class="fas fa-bolt text-[9px]"></i> <span>Generate &amp; Preview</span>
+                </button>
+            </div>
             
             <!-- Optimized Low-API Auto-Save & Cloud Sync Bar -->
-            <div class="mt-2.5 px-3 py-1.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between text-[10px]">
+            <div class="mt-2 px-3 py-1.5 bg-slate-900 rounded-lg border border-slate-800 flex items-center justify-between text-[10px]">
                 <div class="flex items-center gap-1.5">
                     <span id="autoSaveDot" class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
                     <span id="autoSaveText" class="text-slate-300 font-medium">Local Auto-Saved (0 API Cost)</span>
@@ -860,6 +873,29 @@
                                 <button type="button" onclick="window.setBranch('dang', true)" class="bg-orange-600 hover:bg-orange-500 text-white font-bold px-2.5 py-0.5 rounded text-[10px] shadow transition">
                                     Use Dang Branch
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Quotation Validity & Estimated Project Timeline -->
+                        <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-slate-800/80">
+                            <div>
+                                <label class="text-[9px] text-slate-300 font-semibold block mb-0.5">
+                                    <i class="fas fa-hourglass-half text-orange-400 mr-1"></i>Quote Validity
+                                </label>
+                                <select id="quoteValiditySelect" onchange="window.onQuoteValidityChange()" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-orange-300 font-semibold outline-none cursor-pointer">
+                                    <option value="15 Days" selected>15 Days (Standard)</option>
+                                    <option value="30 Days">30 Days</option>
+                                    <option value="45 Days">45 Days</option>
+                                    <option value="7 Days">7 Days</option>
+                                    <option value="custom">Custom Validity...</option>
+                                </select>
+                                <input type="text" id="quoteValidityCustom" value="15 Days" placeholder="e.g. 20 Days" class="hidden mt-1 w-full bg-slate-900 border border-orange-500/50 rounded-lg px-2 py-1 text-xs text-white outline-none" oninput="if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                            </div>
+                            <div>
+                                <label class="text-[9px] text-slate-300 font-semibold block mb-0.5">
+                                    <i class="fas fa-calendar-alt text-orange-400 mr-1"></i>Est. Completion Time
+                                </label>
+                                <input type="text" id="projectTimeline" value="6–8 Months" placeholder="e.g. 10–14 Months" class="w-full bg-slate-900/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white input-glow outline-none font-medium" oninput="window.isTimelineManuallyEdited = true; if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
                             </div>
                         </div>
                     </div>
@@ -1772,6 +1808,72 @@
                     </div>
                 </div>
 
+                <!-- Stage-Wise Payment Schedule (Optional, Unchecked by Default) -->
+                <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-orange-400 uppercase tracking-wider">
+                            <input type="checkbox" id="includePaymentSchedule" class="rounded text-orange-600 focus:ring-0 bg-slate-900 border-slate-700 cursor-pointer" onchange="window.togglePaymentScheduleOptions(); if(window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) window.generateBOQ();">
+                            <span><i class="fas fa-money-check-alt mr-1"></i>Stage-Wise Payment Schedule</span>
+                        </label>
+                        <span class="text-[9px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-mono">Optional</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-tight">Tick to add a Payment Milestone Table auto-calculated from Grand Total.</p>
+
+                    <div id="paymentScheduleOptionsBox" class="hidden space-y-2 pt-2 border-t border-slate-700/60">
+                        <div class="flex items-center justify-between text-[10px]">
+                            <span class="text-slate-300 font-semibold">Milestone Percentages (%):</span>
+                            <div class="flex items-center gap-1.5">
+                                <span id="paymentScheduleSumBadge" class="px-2 py-0.5 rounded font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">Total: 100%</span>
+                                <button type="button" onclick="window.resetPaymentScheduleDefaults()" class="text-[9px] text-orange-400 hover:text-orange-300 underline cursor-pointer">Reset</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-1.5 text-[10px]">
+                            <div class="flex items-center justify-between gap-2 bg-slate-900/80 px-2 py-1 rounded border border-slate-700/60">
+                                <span class="text-slate-200 truncate">1. Advance / Mobilization</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <input type="number" id="payStage1" value="15" min="0" max="100" step="1" oninput="window.updatePaymentScheduleSum()" class="w-12 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-orange-300 font-mono font-bold text-right outline-none">
+                                    <span class="text-slate-400">%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 bg-slate-900/80 px-2 py-1 rounded border border-slate-700/60">
+                                <span class="text-slate-200 truncate">2. Plinth Complete</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <input type="number" id="payStage2" value="20" min="0" max="100" step="1" oninput="window.updatePaymentScheduleSum()" class="w-12 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-orange-300 font-mono font-bold text-right outline-none">
+                                    <span class="text-slate-400">%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 bg-slate-900/80 px-2 py-1 rounded border border-slate-700/60">
+                                <span class="text-slate-200 truncate">3. Slab Casting</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <input type="number" id="payStage3" value="25" min="0" max="100" step="1" oninput="window.updatePaymentScheduleSum()" class="w-12 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-orange-300 font-mono font-bold text-right outline-none">
+                                    <span class="text-slate-400">%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 bg-slate-900/80 px-2 py-1 rounded border border-slate-700/60">
+                                <span class="text-slate-200 truncate">4. Brickwork &amp; Plaster</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <input type="number" id="payStage4" value="20" min="0" max="100" step="1" oninput="window.updatePaymentScheduleSum()" class="w-12 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-orange-300 font-mono font-bold text-right outline-none">
+                                    <span class="text-slate-400">%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 bg-slate-900/80 px-2 py-1 rounded border border-slate-700/60">
+                                <span class="text-slate-200 truncate">5. Tiles / Paint / MEP</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <input type="number" id="payStage5" value="15" min="0" max="100" step="1" oninput="window.updatePaymentScheduleSum()" class="w-12 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-orange-300 font-mono font-bold text-right outline-none">
+                                    <span class="text-slate-400">%</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between gap-2 bg-slate-900/80 px-2 py-1 rounded border border-slate-700/60">
+                                <span class="text-slate-200 truncate">6. Final Handover</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <input type="number" id="payStage6" value="5" min="0" max="100" step="1" oninput="window.updatePaymentScheduleSum()" class="w-12 bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-xs text-orange-300 font-mono font-bold text-right outline-none">
+                                    <span class="text-slate-400">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Signatories (Autofilled as requested: Prepared By = Project Manager, Director = Saroj Pokhrel) -->
                 <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60 space-y-2">
                     <label class="block text-[11px] font-bold text-orange-400 uppercase tracking-wider">
@@ -1949,6 +2051,16 @@
                                 <span id="coverLocPrefix" class="font-normal text-slate-600">Location:</span> 
                                 <strong class="font-bold text-[#0b1a30] text-base sm:text-lg" id="coverProjectLoc">Kalikanagar</strong>
                             </div>
+                            <div class="pt-1.5 mt-1.5 border-t border-slate-200 grid grid-cols-2 gap-3 text-xs sm:text-sm font-sans">
+                                <div>
+                                    <span id="coverValidityPrefix" class="text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Quote Validity:</span>
+                                    <strong class="font-bold text-[#0b1a30]" id="coverQuoteValidity">15 Days</strong>
+                                </div>
+                                <div>
+                                    <span id="coverTimelinePrefix" class="text-slate-500 block text-[10px] uppercase font-bold tracking-wider">Est. Timeline:</span>
+                                    <strong class="font-bold text-[#b91c1c]" id="coverProjectTimeline">6–8 Months</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2048,6 +2160,18 @@
                     <div class="stat-card">
                         <p class="text-[9px] uppercase text-slate-500 font-bold mb-0.5">Total Floors</p>
                         <p class="font-bold text-orange-600 text-xs"><span id="dispFloors">0</span></p>
+                    </div>
+                </div>
+
+                <!-- Quotation Validity & Project Timeline Header Strip -->
+                <div class="grid grid-cols-2 gap-3 text-[11px] bg-white px-3 py-2 rounded-lg border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <span id="lblHeaderValidity" class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-hourglass-half text-orange-500 mr-1"></i>Quotation Validity</span>
+                        <span id="dispQuoteValidity" class="font-bold text-slate-800">15 Days</span>
+                    </div>
+                    <div class="flex items-center justify-between border-l border-slate-200 pl-3">
+                        <span id="lblHeaderTimeline" class="text-slate-500 text-[9.5px] uppercase font-bold"><i class="fas fa-calendar-check text-orange-500 mr-1"></i>Est. Completion Time</span>
+                        <span id="dispProjectTimeline" class="font-bold text-orange-700">6–8 Months</span>
                     </div>
                 </div>
 
@@ -2436,18 +2560,22 @@
             <!-- Warranty & Guarantee Terms Section (Shown only when ticked) -->
             <div id="boqWarrantySection" class="hidden mt-6 mb-8 avoid-break"></div>
 
+            <!-- Stage-Wise Payment Schedule Section (Shown only when ticked) -->
+            <div id="boqPaymentScheduleSection" class="hidden mt-6 mb-8 avoid-break"></div>
+
             <!-- Signatures Section -->
             <div class="signature-section grid grid-cols-3 gap-6 avoid-break">
                 <div class="text-center">
                     <div class="signature-line"></div>
                     <p class="font-bold text-slate-800 mt-1.5 text-xs" id="dispPreparedBy">Project Manager</p>
-                    <p class="text-[10px] text-slate-500">Prepared By</p>
+                    <p class="text-[10px] text-slate-500" id="dispPreparedRole">Prepared By</p>
                     <p class="text-[9px] text-slate-400 mt-0.5">Date: <span id="currentDate"></span></p>
                 </div>
                 <div class="text-center">
                     <div class="signature-line"></div>
-                    <p class="font-bold text-slate-800 mt-1.5 text-xs">Site Incharge</p>
-                    <p class="text-[10px] text-slate-500">Supervising Engineer</p>
+                    <p class="font-bold text-slate-800 mt-1.5 text-xs" id="dispClientSigName">Client / Owner</p>
+                    <p class="text-[10px] text-slate-500" id="dispClientSigRole">Client Acceptance &amp; Approval</p>
+                    <p class="text-[9px] text-slate-400 mt-0.5" id="dispClientSigSub">Signature &amp; Date</p>
                 </div>
                 <div class="text-center">
                     <div class="signature-line"></div>
@@ -2572,7 +2700,7 @@
                 if (cleanUser === "butwal" && cleanPass === "construction123") {
                     return { success: true, user: { username: "butwal", role: "Director / Admin", name: "Saroj Pokhrel" } };
                 }
-                return { success: false, message: "Backend not connected. Use default: butwal / construction123" };
+                return { success: false, message: "Invalid ID or Password (Backend offline)." };
             }
         };
 
@@ -3131,6 +3259,11 @@
                 boqLanguage: window.boqLanguage || 'en',
                 includeInteriorPutty: document.getElementById('includeInteriorPutty')?.checked ?? true,
                 mainDoorType: document.getElementById('mainDoorType')?.value || 'sal',
+                quoteValiditySelect: document.getElementById('quoteValiditySelect')?.value || '15 Days',
+                quoteValidityCustom: document.getElementById('quoteValidityCustom')?.value || '15 Days',
+                projectTimeline: document.getElementById('projectTimeline')?.value || '6–8 Months',
+                includePaymentSchedule: document.getElementById('includePaymentSchedule')?.checked ?? false,
+                paymentMilestones: window.getPaymentMilestonePercents ? window.getPaymentMilestonePercents() : [15, 20, 25, 20, 15, 5],
                 includeCoverPageInPrint: document.getElementById('includeCoverPageInPrint')?.checked ?? true,
                 hideRatesInPrint: document.getElementById('hideRatesInPrint')?.checked ?? false,
                 showAreaInPrint: document.getElementById('showAreaInPrint')?.checked ?? true,
@@ -3576,6 +3709,10 @@
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
             sessionStorage.removeItem('boq_auth_user');
+            const uEl = document.getElementById('username');
+            const pEl = document.getElementById('password');
+            if (uEl) uEl.value = '';
+            if (pEl) pEl.value = '';
             document.getElementById('loginModal').style.display = 'flex';
         });
 
@@ -6019,6 +6156,11 @@
                 structuralWarrantyDuration: document.getElementById('structuralWarrantyDuration')?.value || '5 Years',
                 structuralWarrantyCustom: document.getElementById('structuralWarrantyCustom')?.value || '5 Years',
                 otherWarrantyNote: document.getElementById('otherWarrantyNote')?.value || 'As per respective Brand / Manufacturer Warranty Policy',
+                quoteValiditySelect: document.getElementById('quoteValiditySelect')?.value || '15 Days',
+                quoteValidityCustom: document.getElementById('quoteValidityCustom')?.value || '15 Days',
+                projectTimeline: document.getElementById('projectTimeline')?.value || '6–8 Months',
+                includePaymentSchedule: document.getElementById('includePaymentSchedule')?.checked ?? false,
+                paymentMilestones: window.getPaymentMilestonePercents ? window.getPaymentMilestonePercents() : [15, 20, 25, 20, 15, 5],
                 materialSpecs: JSON.stringify({
                     cement: document.getElementById('ms_cement')?.value || '',
                     rod: document.getElementById('ms_rod')?.value || '',
@@ -6138,6 +6280,21 @@
             if (coverClient) coverClient.textContent = clientName;
             const coverLoc = document.getElementById('coverProjectLoc');
             if (coverLoc) coverLoc.textContent = projectLoc;
+
+            const rawValidity = window.getQuoteValidityText ? window.getQuoteValidityText() : '15 Days';
+            const rawTimeline = document.getElementById('projectTimeline')?.value.trim() || '6–8 Months';
+            const npValidityMap = { '7 Days': '७ दिन', '15 Days': '१५ दिन', '30 Days': '३० दिन', '45 Days': '४५ दिन' };
+            const dispValidity = isNp ? (npValidityMap[rawValidity] || rawValidity) : rawValidity;
+            const dispTimeline = isNp ? rawTimeline.replace(/Months?/gi, 'महिना').replace(/Days?/gi, 'दिन') : rawTimeline;
+
+            const coverValEl = document.getElementById('coverQuoteValidity');
+            if (coverValEl) coverValEl.textContent = dispValidity;
+            const coverTimeEl = document.getElementById('coverProjectTimeline');
+            if (coverTimeEl) coverTimeEl.textContent = dispTimeline;
+            const hdrValEl = document.getElementById('dispQuoteValidity');
+            if (hdrValEl) hdrValEl.textContent = dispValidity;
+            const hdrTimeEl = document.getElementById('dispProjectTimeline');
+            if (hdrTimeEl) hdrTimeEl.textContent = dispTimeline;
             if (isExistingGf) {
                 document.getElementById('dispArea').innerHTML = `<span>${formatQty(activeBuiltup)} Sq.Ft</span> <span class="text-[9.5px] text-emerald-800 font-semibold block">(Billed Scope • GF ${formatQty(liveStats.gfWallArea + liveStats.gfBalconyArea)} Existing)</span>`;
                 document.getElementById('dispFloors').innerHTML = `<span>${activeFloors} New Floor${activeFloors > 1 ? 's' : ''}</span> <span class="text-[9.5px] text-slate-500 font-normal block">(Base GF Existing)</span>`;
@@ -6353,6 +6510,8 @@
             }
 
             document.getElementById('dispPreparedBy').textContent = document.getElementById('preparedBy').value || 'Project Manager';
+            const dispClientSigEl = document.getElementById('dispClientSigName');
+            if (dispClientSigEl) dispClientSigEl.textContent = clientName;
             document.getElementById('dispApprovedBy').textContent = document.getElementById('approvedBy').value || 'Saroj Pokhrel';
 
             // Key Materials (+10% wastage) scaled dynamically to Number of Columns & Top Floor Roof Type
@@ -7790,6 +7949,87 @@
                 }
             }
 
+            // Render Stage-Wise Payment Schedule Section (Only when ticked; unchecked by default)
+            const boqPaymentSection = document.getElementById('boqPaymentScheduleSection');
+            if (boqPaymentSection) {
+                const includePaymentSchedule = document.getElementById('includePaymentSchedule')?.checked ?? false;
+                if (includePaymentSchedule) {
+                    boqPaymentSection.classList.remove('hidden');
+                    const pcts = window.getPaymentMilestonePercents ? window.getPaymentMilestonePercents() : [15, 20, 25, 20, 15, 5];
+                    const totalPct = pcts.reduce((a, b) => a + b, 0);
+                    const stageMeta = [
+                        { en: 'Advance / Mobilization & Site Setup', np: 'पेश्की तथा साइट मोबिलाइजेसन र तयारी' },
+                        { en: 'Foundation & Plinth Level Completion', np: 'जग तथा पिलिन्थ लेभल निर्माण सम्पन्न' },
+                        { en: 'RCC Slab & Beam Casting', np: 'आरसीसी स्ल्याब तथा बिम ढलान कार्य' },
+                        { en: 'Brickwork & Plastering Completion', np: 'इँटा चिनाई तथा प्लास्टर कार्य सम्पन्न' },
+                        { en: 'Tiles, Painting, Electrical & Plumbing (MEP)', np: 'टायल, रङरोगन, बिजुली तथा प्लम्बिङ कार्य' },
+                        { en: 'Final Handover & Snag Rectification', np: 'अन्तिम हस्तान्तरण तथा साँचो बुझाउने कार्य' }
+                    ];
+
+                    let runningSum = 0;
+                    const rowsHtml = stageMeta.map((st, idx) => {
+                        const pct = pcts[idx] || 0;
+                        let amt = Math.round((finalCombinedTotal * pct) / 100);
+                        if (idx === stageMeta.length - 1 && Math.abs(totalPct - 100) < 0.01) {
+                            amt = Math.max(0, Math.round(finalCombinedTotal) - runningSum);
+                        } else {
+                            runningSum += amt;
+                        }
+                        return `
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="py-2 px-3 text-slate-500 font-mono text-center">${idx + 1}</td>
+                                <td class="py-2 px-3 font-semibold text-slate-800">${isNp ? st.np : st.en}</td>
+                                <td class="py-2 px-3 text-center font-mono font-bold text-orange-700">${pct}%</td>
+                                <td class="py-2 px-3 text-right font-mono font-bold text-slate-900">${formatMoney(amt)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    const totalScheduledAmt = Math.abs(totalPct - 100) < 0.01
+                        ? finalCombinedTotal
+                        : (finalCombinedTotal * totalPct) / 100;
+
+                    boqPaymentSection.innerHTML = `
+                        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm text-slate-800 avoid-break">
+                            <div class="border-b-2 border-orange-500 pb-3 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                <div>
+                                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-money-check-alt text-orange-600"></i> ${isNp ? 'चरणबद्ध भुक्तानी तालिका (STAGE-WISE PAYMENT SCHEDULE)' : 'STAGE-WISE PAYMENT MILESTONE SCHEDULE'}
+                                    </h3>
+                                    <p class="text-[10px] text-slate-500 mt-0.5">${isNp ? 'कुल निर्माण लागत अनुसार कार्य प्रगतिको आधारमा भुक्तानी विवरण' : 'Progress-linked installment schedule auto-calculated from total estimated contract value'}</p>
+                                </div>
+                                <span class="self-start sm:self-center text-[10px] bg-orange-50 text-orange-800 font-bold px-3 py-1 rounded border border-orange-200 font-mono">
+                                    ${isNp ? `जम्मा: ${totalPct}%` : `Total: ${totalPct}%`}
+                                </span>
+                            </div>
+                            <div class="overflow-hidden rounded-lg border border-slate-200">
+                                <table class="w-full text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-800 text-white font-semibold">
+                                            <th class="py-2 px-3 text-center w-12">${isNp ? 'क्र.सं.' : 'Stage'}</th>
+                                            <th class="py-2 px-3 text-left">${isNp ? 'निर्माण कार्यको चरण (Milestone)' : 'Work Progress Milestone'}</th>
+                                            <th class="py-2 px-3 text-center w-24">${isNp ? 'प्रतिशत (%)' : 'Share (%)'}</th>
+                                            <th class="py-2 px-3 text-right w-40 bg-orange-600">${isNp ? 'भुक्तानी रकम (रु.)' : 'Payable Amount (NPR)'}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">${rowsHtml}</tbody>
+                                    <tfoot>
+                                        <tr class="bg-slate-100 font-black text-slate-900 border-t-2 border-slate-300">
+                                            <td colspan="2" class="py-2.5 px-3 text-right uppercase text-[11px] tracking-wider">${isNp ? 'कुल सम्झौता रकम (Grand Total)' : 'Total Contract Payable'}</td>
+                                            <td class="py-2.5 px-3 text-center font-mono text-orange-700">${totalPct}%</td>
+                                            <td class="py-2.5 px-3 text-right font-mono text-emerald-700 text-sm">${formatMoney(totalScheduledAmt)}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    boqPaymentSection.classList.add('hidden');
+                    boqPaymentSection.innerHTML = '';
+                }
+            }
+
             // Reveal document
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('boqDocument').classList.remove('hidden');
@@ -8462,6 +8702,30 @@
                 if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
                 if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
 
+                // Restore Validity, Timeline & Payment Schedule
+                if (item.quoteValiditySelect !== undefined && document.getElementById('quoteValiditySelect')) {
+                    document.getElementById('quoteValiditySelect').value = item.quoteValiditySelect;
+                }
+                if (item.quoteValidityCustom !== undefined && document.getElementById('quoteValidityCustom')) {
+                    document.getElementById('quoteValidityCustom').value = item.quoteValidityCustom;
+                }
+                if (typeof window.onQuoteValidityChange === 'function') window.onQuoteValidityChange(true);
+                if (item.projectTimeline !== undefined && document.getElementById('projectTimeline')) {
+                    document.getElementById('projectTimeline').value = item.projectTimeline;
+                    window.isTimelineManuallyEdited = true;
+                }
+                if (document.getElementById('includePaymentSchedule')) {
+                    document.getElementById('includePaymentSchedule').checked = !!item.includePaymentSchedule;
+                }
+                if (Array.isArray(item.paymentMilestones)) {
+                    item.paymentMilestones.forEach((v, idx) => {
+                        const el = document.getElementById(`payStage${idx + 1}`);
+                        if (el && v !== undefined) el.value = v;
+                    });
+                }
+                if (typeof window.togglePaymentScheduleOptions === 'function') window.togglePaymentScheduleOptions();
+                if (typeof window.updatePaymentScheduleSum === 'function') window.updatePaymentScheduleSum(true);
+
                 // BOQ Item selections
                 if (item.deselectedBOQItemIds) {
                     try {
@@ -8571,6 +8835,10 @@
         // Floor selector change
         document.getElementById('floorsSelect').addEventListener('change', (e) => {
             buildFloorStructure(e.target.value);
+            if (!window.isTimelineManuallyEdited && window.getSmartTimelineForFloors) {
+                const tlEl = document.getElementById('projectTimeline');
+                if (tlEl) tlEl.value = window.getSmartTimelineForFloors(e.target.value);
+            }
             if (!document.getElementById('boqDocument').classList.contains('hidden')) generateBOQ();
             if (window.autoSaveToCloudBackground) window.autoSaveToCloudBackground();
         });
@@ -8672,6 +8940,16 @@
                     if (document.getElementById('otherWarrantyNote')) document.getElementById('otherWarrantyNote').value = "As per respective Brand / Manufacturer Warranty Policy";
                     if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
                     if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
+
+                    // Reset Validity, Timeline & Payment Schedule
+                    window.isTimelineManuallyEdited = false;
+                    if (document.getElementById('quoteValiditySelect')) document.getElementById('quoteValiditySelect').value = "15 Days";
+                    if (document.getElementById('quoteValidityCustom')) document.getElementById('quoteValidityCustom').value = "15 Days";
+                    if (typeof window.onQuoteValidityChange === 'function') window.onQuoteValidityChange(true);
+                    if (document.getElementById('projectTimeline')) document.getElementById('projectTimeline').value = "6–8 Months";
+                    if (document.getElementById('includePaymentSchedule')) document.getElementById('includePaymentSchedule').checked = false;
+                    if (typeof window.resetPaymentScheduleDefaults === 'function') window.resetPaymentScheduleDefaults(true);
+                    if (typeof window.togglePaymentScheduleOptions === 'function') window.togglePaymentScheduleOptions();
                     
                     // Reset Out of BOQ fields
                     if (document.getElementById('outOfBoqScope')) document.getElementById('outOfBoqScope').value = "finishing_only";
@@ -8801,6 +9079,16 @@
                     if (typeof window.toggleWarrantyOptions === 'function') window.toggleWarrantyOptions();
                     if (typeof window.onStructuralWarrantyChange === 'function') window.onStructuralWarrantyChange(true);
 
+                    // Reset Validity, Timeline & Payment Schedule
+                    window.isTimelineManuallyEdited = false;
+                    if (document.getElementById('quoteValiditySelect')) document.getElementById('quoteValiditySelect').value = "15 Days";
+                    if (document.getElementById('quoteValidityCustom')) document.getElementById('quoteValidityCustom').value = "15 Days";
+                    if (typeof window.onQuoteValidityChange === 'function') window.onQuoteValidityChange(true);
+                    if (document.getElementById('projectTimeline')) document.getElementById('projectTimeline').value = "6–8 Months";
+                    if (document.getElementById('includePaymentSchedule')) document.getElementById('includePaymentSchedule').checked = false;
+                    if (typeof window.resetPaymentScheduleDefaults === 'function') window.resetPaymentScheduleDefaults(true);
+                    if (typeof window.togglePaymentScheduleOptions === 'function') window.togglePaymentScheduleOptions();
+
                     window.customItems = [];
                     renderCustomItems();
                     buildFloorStructure("1");
@@ -8831,26 +9119,77 @@
         applyPrintDisplaySettings();
         updateLiveCalculations();
 
-        let isSidebarFullscreen = false;
-        window.toggleSidebarFullscreen = function() {
+        let sidebarMode = 'normal'; // 'normal' | 'half' | 'full'
+        window.setSidebarMode = function(mode) {
             const sidebar = document.querySelector('.sidebar-panel');
-            const icon = document.getElementById('sidebarExpandIcon');
-            const text = document.getElementById('sidebarExpandText');
-            isSidebarFullscreen = !isSidebarFullscreen;
-            if (isSidebarFullscreen) {
-                sidebar.classList.remove('w-[460px]');
+            const halfBtn = document.getElementById('sidebarHalfBtn');
+            const halfIcon = document.getElementById('sidebarHalfIcon');
+            const halfText = document.getElementById('sidebarHalfText');
+            const fullBtn = document.getElementById('sidebarFullBtn');
+            const fullIcon = document.getElementById('sidebarExpandIcon');
+            const fullText = document.getElementById('sidebarExpandText');
+            const escHint = document.getElementById('sidebarEscHint');
+
+            sidebarMode = mode;
+            if (!sidebar) return;
+
+            sidebar.classList.remove('w-[460px]', 'w-1/2', 'fixed', 'inset-0', 'w-full', 'max-w-none', 'h-full', 'z-50');
+
+            if (mode === 'full') {
                 sidebar.classList.add('fixed', 'inset-0', 'w-full', 'max-w-none', 'h-full', 'z-50');
-                if (icon) icon.className = 'fas fa-compress text-orange-400 text-xs';
-                if (text) text.textContent = 'Restore';
-                showToast('Sidebar expanded to Full Screen (Focus Mode)');
+                if (fullIcon) fullIcon.className = 'fas fa-compress text-white text-[10px]';
+                if (fullText) fullText.textContent = 'Exit Full';
+                if (fullBtn) fullBtn.className = 'bg-orange-600 hover:bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-orange-400 smooth-transition flex items-center gap-1 cursor-pointer';
+                if (halfIcon) halfIcon.className = 'fas fa-columns text-orange-400 text-[10px]';
+                if (halfText) halfText.textContent = 'Half Screen';
+                if (halfBtn) halfBtn.className = 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1 cursor-pointer';
+                if (escHint) escHint.classList.remove('hidden');
+                showToast('Sidebar expanded to Full Screen (Press Esc to exit)');
+            } else if (mode === 'half') {
+                sidebar.classList.add('w-1/2');
+                if (halfIcon) halfIcon.className = 'fas fa-compress text-white text-[10px]';
+                if (halfText) halfText.textContent = 'Exit Half';
+                if (halfBtn) halfBtn.className = 'bg-orange-600 hover:bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-orange-400 smooth-transition flex items-center gap-1 cursor-pointer';
+                if (fullIcon) fullIcon.className = 'fas fa-expand text-orange-400 text-[10px]';
+                if (fullText) fullText.textContent = 'Full Screen';
+                if (fullBtn) fullBtn.className = 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1 cursor-pointer';
+                if (escHint) escHint.classList.remove('hidden');
+                showToast('Sidebar set to Half Screen (50%) — Press Esc to exit');
             } else {
-                sidebar.classList.remove('fixed', 'inset-0', 'w-full', 'max-w-none', 'h-full', 'z-50');
                 sidebar.classList.add('w-[460px]');
-                if (icon) icon.className = 'fas fa-expand text-orange-400 text-xs';
-                if (text) text.textContent = 'Focus';
-                showToast('Sidebar restored to normal view');
+                if (halfIcon) halfIcon.className = 'fas fa-columns text-orange-400 text-[10px]';
+                if (halfText) halfText.textContent = 'Half Screen';
+                if (halfBtn) halfBtn.className = 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1 cursor-pointer';
+                if (fullIcon) fullIcon.className = 'fas fa-expand text-orange-400 text-[10px]';
+                if (fullText) fullText.textContent = 'Full Screen';
+                if (fullBtn) fullBtn.className = 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-semibold px-2 py-1 rounded-lg border border-slate-700 smooth-transition flex items-center gap-1 cursor-pointer';
+                if (escHint) escHint.classList.add('hidden');
             }
         };
+
+        window.toggleSidebarHalfScreen = function() {
+            window.setSidebarMode(sidebarMode === 'half' ? 'normal' : 'half');
+        };
+
+        window.toggleSidebarFullscreen = function() {
+            window.setSidebarMode(sidebarMode === 'full' ? 'normal' : 'full');
+        };
+
+        window.quickGenerateAndPreview = function() {
+            if (sidebarMode === 'full') {
+                window.setSidebarMode('normal');
+            }
+            if (typeof generateBOQ === 'function') {
+                generateBOQ();
+            }
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebarMode !== 'normal') {
+                window.setSidebarMode('normal');
+                showToast('Sidebar restored to normal view');
+            }
+        });
 
         window.toggleMachineryInputs = function(type) {
             const chk = document.getElementById(`mach_${type}_enabled`);
@@ -8953,6 +9292,79 @@
 
         window.toggleWarrantyOptions();
         window.onStructuralWarrantyChange(true);
+
+        // Validity, Timeline & Stage-Wise Payment Schedule Helpers
+        window.isTimelineManuallyEdited = false;
+        window.getSmartTimelineForFloors = function(floorsVal) {
+            const f = parseFloat(floorsVal) || 1;
+            if (f <= 1) return '6–8 Months';
+            if (f <= 2) return '8–12 Months';
+            if (f <= 3) return '10–14 Months';
+            return '14–18 Months';
+        };
+
+        window.onQuoteValidityChange = function(skipRegenerate = false) {
+            const sel = document.getElementById('quoteValiditySelect');
+            const customInp = document.getElementById('quoteValidityCustom');
+            if (sel && customInp) {
+                if (sel.value === 'custom') customInp.classList.remove('hidden');
+                else customInp.classList.add('hidden');
+            }
+            if (!skipRegenerate && window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) {
+                window.generateBOQ();
+            }
+        };
+
+        window.getQuoteValidityText = function() {
+            const selVal = document.getElementById('quoteValiditySelect')?.value || '15 Days';
+            if (selVal === 'custom') {
+                return document.getElementById('quoteValidityCustom')?.value.trim() || '15 Days';
+            }
+            return selVal;
+        };
+
+        window.togglePaymentScheduleOptions = function() {
+            const chk = document.getElementById('includePaymentSchedule');
+            const box = document.getElementById('paymentScheduleOptionsBox');
+            if (chk && box) {
+                if (chk.checked) box.classList.remove('hidden');
+                else box.classList.add('hidden');
+            }
+        };
+
+        window.getPaymentMilestonePercents = function() {
+            return [1, 2, 3, 4, 5, 6].map(n => parseFloat(document.getElementById(`payStage${n}`)?.value) || 0);
+        };
+
+        window.updatePaymentScheduleSum = function(skipRegenerate = false) {
+            const pcts = window.getPaymentMilestonePercents();
+            const sum = Math.round(pcts.reduce((a, b) => a + b, 0) * 100) / 100;
+            const badge = document.getElementById('paymentScheduleSumBadge');
+            if (badge) {
+                badge.textContent = `Total: ${sum}%`;
+                if (Math.abs(sum - 100) < 0.01) {
+                    badge.className = 'px-2 py-0.5 rounded font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40';
+                } else {
+                    badge.className = 'px-2 py-0.5 rounded font-mono font-bold bg-amber-950 text-amber-300 border border-amber-500/40';
+                }
+            }
+            if (!skipRegenerate && window.generateBOQ && !document.getElementById('boqDocument')?.classList.contains('hidden')) {
+                window.generateBOQ();
+            }
+        };
+
+        window.resetPaymentScheduleDefaults = function(skipRegenerate = false) {
+            const defaults = [15, 20, 25, 20, 15, 5];
+            defaults.forEach((v, i) => {
+                const el = document.getElementById(`payStage${i + 1}`);
+                if (el) el.value = v;
+            });
+            window.updatePaymentScheduleSum(skipRegenerate);
+        };
+
+        window.onQuoteValidityChange(true);
+        window.togglePaymentScheduleOptions();
+        window.updatePaymentScheduleSum(true);
 
         // Restore any existing autosave cache immediately so user never loses state
         try {
